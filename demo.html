@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head><title>Demo Loader</title></head>
+<body>
+<script>
+const demoData = {
+  categories: [
+    {
+      id: 'cat_claude',
+      name: 'Claude Code',
+      icon: '🤖',
+      color: '#6940a5',
+      repos: [
+        {
+          id: 'repo_claude_code',
+          url: 'https://github.com/anthropics/claude-code',
+          name: 'claude-code',
+          fullName: 'anthropics/claude-code',
+          owner: 'anthropics',
+          description: 'An agentic coding tool that lives in your terminal, built by Anthropic',
+          stars: 35200,
+          forks: 2100,
+          language: 'TypeScript',
+          topics: ['ai', 'coding', 'terminal', 'claude', 'mcp'],
+          homepage: 'https://docs.anthropic.com/claude-code',
+          license: 'MIT',
+          createdAt: '2024-11-15T00:00:00Z',
+          updatedAt: '2025-04-10T00:00:00Z',
+          openIssues: 142,
+          addedAt: new Date().toISOString(),
+          _collapsed: true,
+          ai_analysis: {
+            summary: 'Claude Code là công cụ AI coding chạy trong terminal, cho phép viết code, sửa lỗi và review code tự động thông qua Claude AI.',
+            features: [
+              'Terminal-based AI coding assistant',
+              'Multi-file editing & refactoring',
+              'Git integration & commit automation',
+              'Code review & test generation',
+              'MCP server support',
+              'Autonomous coding mode'
+            ],
+            useCases: [
+              'Pair programming với AI trong terminal',
+              'Tự động hóa code review',
+              'Refactor codebase lớn'
+            ],
+            explanation: 'Giống như có một lập trình viên senior ngồi cạnh bạn trong terminal, giúp viết code và sửa lỗi.'
+          }
+        },
+        {
+          id: 'repo_anthropic_sdk',
+          url: 'https://github.com/anthropics/anthropic-sdk-python',
+          name: 'anthropic-sdk-python',
+          fullName: 'anthropics/anthropic-sdk-python',
+          owner: 'anthropics',
+          description: 'Python SDK for the Anthropic API - Build AI applications with Claude',
+          stars: 8500,
+          forks: 920,
+          language: 'Python',
+          topics: ['api', 'sdk', 'claude', 'python', 'llm'],
+          homepage: 'https://docs.anthropic.com',
+          license: 'MIT',
+          createdAt: '2023-03-14T00:00:00Z',
+          updatedAt: '2025-04-08T00:00:00Z',
+          openIssues: 67,
+          addedAt: new Date().toISOString(),
+          _collapsed: true,
+          ai_analysis: {
+            summary: 'SDK chính thức để tương tác với Claude API từ Python, hỗ trợ streaming, tool use và vision.',
+            features: [
+              'Streaming responses',
+              'Tool use / Function calling',
+              'Batch API support',
+              'Vision & multimodal',
+              'Token counting',
+              'Async support'
+            ],
+            useCases: [
+              'Xây dựng chatbot với Claude',
+              'Tích hợp AI vào ứng dụng Python',
+              'Automation workflows'
+            ],
+            explanation: 'SDK giúp kết nối ứng dụng Python với Claude API một cách dễ dàng.'
+          }
+        }
+      ]
+    },
+    {
+      id: 'cat_antigravity',
+      name: 'Antigravity',
+      icon: '🚀',
+      color: '#2eaadc',
+      repos: [
+        {
+          id: 'repo_antigravity',
+          url: 'https://github.com/GoogleDeepMind/antigravity',
+          name: 'antigravity',
+          fullName: 'GoogleDeepMind/antigravity',
+          owner: 'GoogleDeepMind',
+          description: 'Advanced AI-powered coding assistant by Google DeepMind',
+          stars: 12000,
+          forks: 800,
+          language: 'Python',
+          topics: ['ai', 'coding-assistant', 'deepmind', 'gemini'],
+          homepage: '',
+          license: 'Apache-2.0',
+          createdAt: '2025-01-15T00:00:00Z',
+          updatedAt: '2025-04-11T00:00:00Z',
+          openIssues: 45,
+          addedAt: new Date().toISOString(),
+          _collapsed: true,
+          ai_analysis: {
+            summary: 'Antigravity là AI coding assistant tiên tiến từ Google DeepMind, hỗ trợ browser automation, Stitch design và MCP integration.',
+            features: [
+              'Multi-model AI support',
+              'Browser automation & testing',
+              'File editing & creation',
+              'MCP server integration',
+              'Stitch design system',
+              'Web scraping & research'
+            ],
+            useCases: [
+              'Full-stack web development',
+              'Design system automation',
+              'Automated research & analysis'
+            ],
+            explanation: 'Trợ lý coding AI có thể điều khiển trình duyệt, tạo thiết kế UI và nghiên cứu web tự động.'
+          }
+        }
+      ]
+    },
+    {
+      id: 'cat_n8n',
+      name: 'n8n Automation',
+      icon: '⚡',
+      color: '#d9730d',
+      repos: [
+        {
+          id: 'repo_n8n',
+          url: 'https://github.com/n8n-io/n8n',
+          name: 'n8n',
+          fullName: 'n8n-io/n8n',
+          owner: 'n8n-io',
+          description: 'Fair-code workflow automation platform with 400+ integrations',
+          stars: 51000,
+          forks: 8200,
+          language: 'TypeScript',
+          topics: ['automation', 'workflow', 'integration', 'no-code'],
+          homepage: 'https://n8n.io',
+          license: 'sustainability',
+          createdAt: '2019-06-22T00:00:00Z',
+          updatedAt: '2025-04-12T00:00:00Z',
+          openIssues: 312,
+          addedAt: new Date().toISOString(),
+          _collapsed: true,
+          ai_analysis: {
+            summary: 'n8n là nền tảng tự động hóa workflow mã nguồn mở với giao diện kéo thả và hơn 400 tích hợp.',
+            features: [
+              'Visual workflow builder',
+              'Self-hosted & cloud options',
+              '400+ integrations',
+              'Custom code nodes (JS/Python)',
+              'Webhook triggers',
+              'AI agent nodes'
+            ],
+            useCases: [
+              'Tự động hóa marketing & CRM',
+              'Data pipeline orchestration',
+              'AI workflow automation'
+            ],
+            explanation: 'Giống Zapier nhưng tự host được, linh hoạt hơn và hỗ trợ code tuỳ chỉnh.'
+          }
+        },
+        {
+          id: 'repo_n8n_nodes',
+          url: 'https://github.com/n8n-io/n8n-nodes-base',
+          name: 'n8n-nodes-base',
+          fullName: 'n8n-io/n8n-nodes-base',
+          owner: 'n8n-io',
+          description: 'Base nodes for n8n workflow automation platform',
+          stars: 2800,
+          forks: 1500,
+          language: 'TypeScript',
+          topics: ['nodes', 'connectors', 'automation'],
+          homepage: 'https://docs.n8n.io',
+          license: 'sustainability',
+          createdAt: '2019-08-15T00:00:00Z',
+          updatedAt: '2025-04-11T00:00:00Z',
+          openIssues: 89,
+          addedAt: new Date().toISOString(),
+          _collapsed: true,
+          ai_analysis: {
+            summary: 'Package chứa tất cả các nodes tích hợp cơ bản cho n8n, từ HTTP requests đến cloud services.',
+            features: [
+              'HTTP Request node',
+              'Database connectors',
+              'Cloud service integrations',
+              'File operations',
+              'Email automation',
+              'Social media nodes'
+            ],
+            useCases: [
+              'Tạo custom integrations',
+              'Kết nối APIs khác nhau',
+              'Xử lý dữ liệu tự động'
+            ],
+            explanation: 'Bộ sưu tập các khối lego kết nối n8n với hàng trăm dịch vụ bên ngoài.'
+          }
+        }
+      ]
+    },
+    {
+      id: 'cat_ai_memory',
+      name: 'AI Memory',
+      icon: '🧠',
+      color: '#0f7b6c',
+      repos: [
+        {
+          id: 'repo_langchain',
+          url: 'https://github.com/langchain-ai/langchain',
+          name: 'langchain',
+          fullName: 'langchain-ai/langchain',
+          owner: 'langchain-ai',
+          description: 'Build context-aware reasoning applications with LLMs',
+          stars: 95000,
+          forks: 15000,
+          language: 'Python',
+          topics: ['llm', 'ai', 'nlp', 'agents', 'rag'],
+          homepage: 'https://langchain.com',
+          license: 'MIT',
+          createdAt: '2022-10-25T00:00:00Z',
+          updatedAt: '2025-04-12T00:00:00Z',
+          openIssues: 1200,
+          addedAt: new Date().toISOString(),
+          _collapsed: true,
+          ai_analysis: {
+            summary: 'LangChain là framework #1 để xây dựng ứng dụng AI với LLMs, hỗ trợ RAG, agents và memory systems.',
+            features: [
+              'Chain composition & LCEL',
+              'Agent framework',
+              'Memory & conversation systems',
+              'RAG pipeline',
+              'Tool integration',
+              'Streaming support'
+            ],
+            useCases: [
+              'Chatbot với long-term memory',
+              'Document Q&A systems',
+              'Autonomous AI agents'
+            ],
+            explanation: 'Framework giúp kết nối LLMs với dữ liệu và công cụ bên ngoài để tạo ứng dụng AI thông minh.'
+          }
+        },
+        {
+          id: 'repo_mem0',
+          url: 'https://github.com/mem0ai/mem0',
+          name: 'mem0',
+          fullName: 'mem0ai/mem0',
+          owner: 'mem0ai',
+          description: 'The Memory layer for AI apps - Long-term memory for LLMs',
+          stars: 24000,
+          forks: 2300,
+          language: 'Python',
+          topics: ['memory', 'ai', 'llm', 'embeddings', 'vector-db'],
+          homepage: 'https://mem0.ai',
+          license: 'Apache-2.0',
+          createdAt: '2023-08-10T00:00:00Z',
+          updatedAt: '2025-04-10T00:00:00Z',
+          openIssues: 156,
+          addedAt: new Date().toISOString(),
+          _collapsed: true,
+          ai_analysis: {
+            summary: 'Mem0 cung cấp tầng bộ nhớ dài hạn cho ứng dụng AI, cho phép LLMs nhớ thông tin qua các phiên làm việc.',
+            features: [
+              'Persistent memory layer',
+              'Multi-user memory isolation',
+              'Smart retrieval with relevance',
+              'Memory graphs & relationships',
+              'Cross-session context',
+              'Vector storage integration'
+            ],
+            useCases: [
+              'AI assistant với bộ nhớ dài hạn',
+              'Personalized user experiences',
+              'Knowledge management systems'
+            ],
+            explanation: 'Giống như bộ nhớ dài hạn cho AI - giúp chatbot nhớ người dùng và ngữ cảnh qua nhiều cuộc trò chuyện.'
+          }
+        }
+      ]
+    }
+  ],
+  settings: {
+    theme: 'dark',
+    openrouterApiKey: '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'
+  }
+};
+
+localStorage.setItem('github_dashboard_data', JSON.stringify(demoData));
+window.location.href = 'index.html';
+</script>
+<p>Loading demo data...</p>
+</body>
+</html>

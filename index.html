@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="GitHub Dashboard - Quản lý và phân tích GitHub repos bằng bản đồ tư duy trực quan">
+  <title>GitHub Dashboard — Bản đồ Tư duy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playwrite+VN:wght@100;400&family=Mali:wght@300;400;600;700&family=Baloo+2:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header" id="header">
+    <button class="btn btn--ghost btn--icon" id="toggleSidebar" title="Toggle sidebar">☰</button>
+    <div class="header__logo">
+      <span class="header__logo-icon">🗺️</span>
+      <span>GitHub Dashboard</span>
+    </div>
+    <div class="header__search">
+      <span class="header__search-icon">🔍</span>
+      <input type="text" class="header__search-input" id="searchInput" placeholder="Tìm kiếm repos, tính năng...">
+    </div>
+    <div class="header__actions">
+      <button class="btn btn--primary" id="addRepoBtn">
+        <span>＋</span> Thêm Repo
+      </button>
+      <button class="theme-toggle" id="themeToggle" title="Chuyển theme"></button>
+    </div>
+  </header>
+
+  <!-- ===== APP CONTAINER ===== -->
+  <div class="app">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+
+      <!-- Quick Add -->
+      <div class="sidebar__section">
+        <div class="sidebar__title">Thêm nhanh</div>
+        <form class="add-repo-form" id="quickAddForm">
+          <input type="url" class="input" id="quickUrlInput" placeholder="Dán link GitHub repo..." autocomplete="off">
+          <select class="select" id="quickCategorySelect">
+            <option value="">— Chọn danh mục —</option>
+          </select>
+          <button type="submit" class="btn btn--primary" style="width:100%">
+            <span class="spinner" id="quickAddSpinner" style="display:none"></span>
+            <span id="quickAddText">Phân tích & Thêm</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Categories -->
+      <div class="sidebar__section" style="flex:1;overflow-y:auto">
+        <div style="display:flex;align-items:center;justify-content:space-between;height:28px">
+          <div class="sidebar__title" style="margin-bottom:0">Danh mục</div>
+          <button class="btn btn--ghost" id="addCategoryBtn" style="height:28px;padding:0 8px;font-size:12px">＋ Mới</button>
+        </div>
+        <ul class="category-list" id="categoryList">
+          <!-- Dynamic: rendered by JS -->
+        </ul>
+      </div>
+
+      <!-- Settings -->
+      <div class="sidebar__section">
+        <div class="sidebar__title">Cài đặt</div>
+        <div class="settings-group">
+          <div class="form-group">
+            <label class="form-group__label">OpenRouter API Key</label>
+            <input type="password" class="input" id="apiKeyInput" placeholder="sk-or-v1-..." autocomplete="off">
+          </div>
+          <div class="settings-item">
+            <span class="settings-item__label">Dark Mode</span>
+            <button class="theme-toggle" id="sidebarThemeToggle"></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="sidebar__footer">
+        <button class="btn btn--secondary" id="exportBtn">📤 Xuất</button>
+        <button class="btn btn--secondary" id="importBtn">📥 Nhập</button>
+      </div>
+      <input type="file" id="importFile" accept=".json" style="display:none">
+    </aside>
+
+    <!-- ===== MAIN CONTENT (Mind Map) ===== -->
+    <main class="main" id="main">
+      <div class="mindmap-container" id="mindmapContainer">
+        <!-- D3.js SVG rendered here -->
+        <div class="empty-state" id="emptyState">
+          <div class="empty-state__icon">🗺️</div>
+          <h2 class="empty-state__title">Bản đồ Tư duy GitHub</h2>
+          <p class="empty-state__description">
+            Dán link GitHub vào ô bên trái để bắt đầu xây dựng bản đồ tư duy.
+            AI sẽ tự động phân tích và tổ chức repos cho bạn.
+          </p>
+          <button class="btn btn--primary" id="emptyAddBtn">
+            <span>＋</span> Thêm Repo đầu tiên
+          </button>
+        </div>
+      </div>
+
+      <!-- Zoom Controls -->
+      <div class="zoom-controls" id="zoomControls" style="display:none">
+        <button class="btn" id="zoomInBtn" title="Phóng to">＋</button>
+        <button class="btn" id="zoomOutBtn" title="Thu nhỏ">−</button>
+        <button class="btn" id="zoomResetBtn" title="Reset">⟲</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- ===== DETAIL PANEL ===== -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-panel__header">
+      <span style="font-weight:600;font-size:14px">Chi tiết Repo</span>
+      <button class="detail-panel__close" id="closeDetailBtn">✕</button>
+    </div>
+    <div class="detail-panel__body" id="detailBody">
+      <!-- Dynamic: rendered by JS -->
+    </div>
+  </div>
+
+  <!-- ===== ADD REPO MODAL ===== -->
+  <div class="modal-overlay" id="addRepoModal">
+    <div class="modal">
+      <h3 class="modal__title">Thêm GitHub Repo</h3>
+      <form class="modal__form" id="addRepoForm">
+        <div class="form-group">
+          <label class="form-group__label">Link GitHub *</label>
+          <input type="url" class="input" id="modalUrlInput" placeholder="https://github.com/owner/repo" required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-group__label">Danh mục *</label>
+          <select class="select" id="modalCategorySelect" required>
+            <option value="">— Chọn danh mục —</option>
+          </select>
+        </div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--secondary" id="cancelModalBtn">Hủy</button>
+          <button type="submit" class="btn btn--primary" id="modalSubmitBtn">
+            <span class="spinner" id="modalSpinner" style="display:none"></span>
+            <span id="modalSubmitText">Phân tích & Thêm</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== ADD CATEGORY MODAL ===== -->
+  <div class="modal-overlay" id="addCategoryModal">
+    <div class="modal">
+      <h3 class="modal__title" id="categoryModalTitle">Thêm Danh mục</h3>
+      <form class="modal__form" id="addCategoryForm">
+        <div class="form-group">
+          <label class="form-group__label">Tên danh mục *</label>
+          <input type="text" class="input" id="categoryNameInput" placeholder="VD: Claude Code, n8n..." required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-group__label">Icon (emoji)</label>
+          <input type="text" class="input" id="categoryIconInput" placeholder="🤖" maxlength="4">
+        </div>
+        <div class="form-group">
+          <label class="form-group__label">Màu sắc</label>
+          <div class="color-picker" id="colorPicker">
+            <div class="color-swatch selected" data-color="#2eaadc" style="background:#2eaadc"></div>
+            <div class="color-swatch" data-color="#e03e3e" style="background:#e03e3e"></div>
+            <div class="color-swatch" data-color="#d9730d" style="background:#d9730d"></div>
+            <div class="color-swatch" data-color="#dfab01" style="background:#dfab01"></div>
+            <div class="color-swatch" data-color="#0f7b6c" style="background:#0f7b6c"></div>
+            <div class="color-swatch" data-color="#6940a5" style="background:#6940a5"></div>
+            <div class="color-swatch" data-color="#ad1a72" style="background:#ad1a72"></div>
+            <div class="color-swatch" data-color="#64473a" style="background:#64473a"></div>
+          </div>
+        </div>
+        <input type="hidden" id="categoryColorInput" value="#2eaadc">
+        <input type="hidden" id="editCategoryId" value="">
+        <div class="modal__actions">
+          <button type="button" class="btn btn--secondary" id="cancelCategoryBtn">Hủy</button>
+          <button type="submit" class="btn btn--primary">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== CONTEXT MENU ===== -->
+  <div class="context-menu" id="contextMenu" style="display:none">
+    <!-- Dynamic -->
+  </div>
+
+  <!-- ===== COMMAND PALETTE (Ctrl+K) ===== -->
+  <div class="cmd-palette-overlay" id="cmdPalette">
+    <div class="cmd-palette">
+      <div class="cmd-palette__search">
+        <span class="cmd-palette__search-icon">🔍</span>
+        <input type="text" class="cmd-palette__input" id="cmdPaletteInput" placeholder="Tìm repos, thao tác..." autocomplete="off">
+        <kbd class="cmd-palette__kbd">ESC</kbd>
+      </div>
+      <div class="cmd-palette__results" id="cmdPaletteResults">
+        <!-- Dynamic -->
+      </div>
+      <div class="cmd-palette__footer">
+        <span>↑↓ di chuyển</span>
+        <span>↵ chọn</span>
+        <span>esc đóng</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COMPARE REPOS MODAL ===== -->
+  <div class="modal-overlay" id="compareModal">
+    <div class="modal modal--wide">
+      <div class="compare-header">
+        <h3 class="modal__title">📊 So Sánh Repos</h3>
+        <button class="detail-panel__close" id="closeCompareBtn">✕</button>
+      </div>
+      <div class="compare-body" id="compareBody">
+        <!-- Dynamic -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COMPARE FLOATING BUTTON ===== -->
+  <div class="compare-fab" id="compareFab" style="display:none">
+    <span class="compare-fab__count" id="compareFabCount">0</span>
+    <button class="btn btn--primary compare-fab__btn" id="compareFabBtn">
+      📊 So sánh
+    </button>
+    <button class="btn btn--ghost compare-fab__clear" id="compareFabClear" title="Bỏ chọn tất cả">✕</button>
+  </div>
+
+  <!-- ===== TOAST CONTAINER ===== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ===== TOOLTIP ===== -->
+  <div class="tooltip" id="tooltip"></div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="ai.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
