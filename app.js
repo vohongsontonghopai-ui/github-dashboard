@@ -117,7 +117,7 @@ class MindMap {
     this.onNodeRightClick = null;
     this.margin = { top: 40, right: 200, bottom: 40, left: 80 };
     this.nodeWidth = 220;
-    this.nodeHeight = 70;
+    this.nodeHeight = 110;
     this.duration = 400;
   }
 
@@ -177,12 +177,14 @@ class MindMap {
             const details = [];
             if (repo.ai_analysis?.features) {
               repo.ai_analysis.features.slice(0, 4).forEach(f => {
-                details.push({ name: f, type: 'feature', _repo: repo });
+                const label = typeof f === 'string' ? f : (f.name_vi || f.name_en || String(f));
+                details.push({ name: label, type: 'feature', _repo: repo });
               });
             }
             if (repo.ai_analysis?.useCases) {
               repo.ai_analysis.useCases.slice(0, 2).forEach(u => {
-                details.push({ name: u, type: 'usecase', _repo: repo });
+                const label = typeof u === 'string' ? u : (u.title || u.description || String(u));
+                details.push({ name: label, type: 'usecase', _repo: repo });
               });
             }
 
@@ -305,11 +307,11 @@ class MindMap {
       } else if (d.data.type === 'repo') {
         cardClass += ' node-card--repo';
         width = 280;
-        height = 90;
+        height = 160;
       } else {
         cardClass += ' node-card--detail';
         width = 240;
-        height = 56;
+        height = 80;
       }
 
       fo.attr('width', width + 20)
@@ -321,7 +323,8 @@ class MindMap {
       const card = fo.append('xhtml:div')
         .attr('class', cardClass)
         .style('width', width + 'px')
-        .style('height', height + 'px')
+        .style('min-height', height + 'px')
+        .style('height', 'auto')
         .style('display', 'flex')
         .style('flex-direction', 'column')
         .style('justify-content', 'center')
@@ -350,7 +353,7 @@ class MindMap {
         const repo = d.data.data;
         card.html(`
           <div class="node-card__title">${repo.name}</div>
-          <div class="node-card__subtitle">${repo.description?.substring(0, 50) || ''}</div>
+          <div class="node-card__subtitle">${(repo.description || '').length > 80 ? repo.description.substring(0, 80) + '…' : (repo.description || '')}</div>
           <div class="node-card__meta">
             <span class="node-card__badge">⭐ ${formatNumber(repo.stars)}</span>
             <span class="node-card__badge">🔀 ${formatNumber(repo.forks)}</span>
@@ -839,8 +842,17 @@ class App {
         </div>
       ` : ''}
 
-      <!-- ===== ELI5: GIẢI THÍCH NHƯ CHO TRẺ 5 TUỔI ===== -->
-      ${a.eli5 || a.explanation ? `
+      <!-- ===== TÓM TẮT NHANH ===== -->
+      ${a.quickSummary ? `
+        <div class="detail-eli5">
+          <div class="detail-eli5__header">
+            <span class="detail-eli5__emoji">📌</span>
+            <span class="detail-eli5__title">Tóm tắt nhanh</span>
+            <span class="detail-eli5__badge">AI</span>
+          </div>
+          <div class="detail-eli5__content">${a.quickSummary}</div>
+        </div>
+      ` : a.eli5 || a.explanation ? `
         <div class="detail-eli5">
           <div class="detail-eli5__header">
             <span class="detail-eli5__emoji">🧒</span>
@@ -851,28 +863,126 @@ class App {
         </div>
       ` : ''}
 
-      <!-- ===== VẤN ĐỀ GIẢI QUYẾT ===== -->
-      ${a.problemSolved ? `
+      <!-- ===== TỔNG QUAN DỰ ÁN ===== -->
+      ${a.overview ? `
+        <div class="detail-section">
+          <div class="detail-section__title">🗂️ Tổng quan dự án</div>
+          <div class="detail-section__content">${a.overview.purpose || ''}</div>
+          ${a.overview.targetAudience ? `
+            <div class="detail-audience">
+              <span class="detail-audience__icon">👥</span>
+              <span class="detail-audience__text"><strong>Đối tượng:</strong> ${a.overview.targetAudience}</span>
+            </div>
+          ` : ''}
+          ${a.overview.components && a.overview.components.length > 0 ? `
+            <div class="detail-components">
+              <div class="detail-components__title">📁 Thành phần chính:</div>
+              <div class="detail-components__list">
+                ${a.overview.components.map(c => `
+                  <div class="detail-component-item">
+                    <span class="detail-component-item__name">${c.name || ''}</span>
+                    <span class="detail-component-item__desc">${c.description || ''}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      ` : a.problemSolved ? `
         <div class="detail-section">
           <div class="detail-section__title">🔍 Nó giải quyết vấn đề gì?</div>
           <div class="detail-problem">${a.problemSolved}</div>
         </div>
       ` : ''}
 
-      <!-- ===== AI SUMMARY ===== -->
-      ${a.summary ? `
+      <!-- ===== VẤN ĐỀ GIẢI QUYẾT (với ví dụ) ===== -->
+      ${a.problemsSolved && a.problemsSolved.length > 0 ? `
         <div class="detail-section">
-          <div class="detail-section__title">📝 Tóm tắt AI</div>
-          <div class="detail-section__content">${a.summary}</div>
+          <div class="detail-section__title">🔍 Giải quyết vấn đề gì?</div>
+          <div class="detail-problems-list">
+            ${a.problemsSolved.map(p => `
+              <div class="detail-problem-card">
+                <div class="detail-problem-card__header">
+                  <span class="detail-problem-card__icon">${p.icon || '❓'}</span>
+                  <span class="detail-problem-card__title">${p.problem || ''}</span>
+                </div>
+                ${p.explanation ? `<p class="detail-problem-card__explain">${p.explanation}</p>` : ''}
+                ${p.example ? `
+                  <div class="detail-problem-card__example">
+                    <span class="detail-problem-card__example-label">💡 Ví dụ:</span>
+                    <span>${p.example}</span>
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
         </div>
       ` : ''}
 
-      <!-- ===== TÍNH NĂNG CHÍNH (Bilingual Feature Cards) ===== -->
-      ${(a.featuresDetailed && a.featuresDetailed.length > 0) || (a.features && a.features.length > 0) ? `
+      <!-- ===== TÍNH NĂNG CHÍNH ===== -->
+      ${a.keyFeatures && a.keyFeatures.length > 0 ? `
+        <div class="detail-section">
+          <div class="detail-section__title">⚡ Tính năng chính</div>
+          <div class="detail-features-grid">
+            ${a.keyFeatures.map(f => `
+              <div class="detail-feature-card">
+                <div class="detail-feature-card__header">
+                  <span class="detail-feature-card__icon">${f.icon || '⚡'}</span>
+                  <div class="detail-feature-card__names">
+                    <span class="detail-feature-card__name-vi">${f.name || ''}</span>
+                    ${f.nameEn ? `<span class="detail-feature-card__name-en">${f.nameEn}</span>` : ''}
+                  </div>
+                </div>
+                ${f.description ? `<p class="detail-feature-card__desc">${f.description}</p>` : ''}
+                ${f.example ? `
+                  <div class="detail-feature-card__example">
+                    <span>💡</span> <span>${f.example}</span>
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : (a.featuresDetailed && a.featuresDetailed.length > 0) || (a.features && a.features.length > 0) ? `
         <div class="detail-section">
           <div class="detail-section__title">⚡ Tính năng chính</div>
           <div class="detail-features-grid">
             ${renderFeatures()}
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- ===== HƯỚNG DẪN CÀI ĐẶT ===== -->
+      ${a.installation && a.installation.methods && a.installation.methods.length > 0 ? `
+        <div class="detail-section">
+          <div class="detail-section__title">📥 Hướng dẫn cài đặt</div>
+          <div class="detail-install-methods">
+            ${a.installation.methods.map(m => `
+              <div class="detail-install-method ${m.recommended ? 'detail-install-method--recommended' : ''}">
+                <div class="detail-install-method__header">
+                  <span class="detail-install-method__name">${m.name || 'Cài đặt'}</span>
+                  ${m.recommended ? '<span class="detail-install-method__badge">⭐ Khuyên dùng</span>' : ''}
+                </div>
+                ${m.steps && m.steps.length > 0 ? `
+                  <div class="detail-install-steps">
+                    ${m.steps.map((step, i) => `
+                      <div class="detail-install-step">
+                        <span class="detail-install-step__num">${i + 1}</span>
+                        <code class="detail-install-step__code">${step}</code>
+                      </div>
+                    `).join('')}
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : a.quickStart ? `
+        <div class="detail-quickstart">
+          <span class="detail-quickstart__icon">🚀</span>
+          <div>
+            <div class="detail-quickstart__title">Bắt đầu nhanh</div>
+            <div class="detail-quickstart__content">${a.quickStart}</div>
           </div>
         </div>
       ` : ''}
@@ -905,8 +1015,23 @@ class App {
         </div>
       ` : ''}
 
-      <!-- ===== ỨNG DỤNG THỰC TẾ ===== -->
-      ${a.useCases && a.useCases.length > 0 ? `
+      <!-- ===== HIỆU QUẢ ===== -->
+      ${a.effectiveness && a.effectiveness.length > 0 ? `
+        <div class="detail-section">
+          <div class="detail-section__title">✅ Dấu hiệu hiệu quả</div>
+          <div class="detail-effectiveness">
+            ${a.effectiveness.map(e => `
+              <div class="detail-effectiveness__item">
+                <span class="detail-effectiveness__check">✓</span>
+                <span>${e}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- ===== ỨNG DỤNG THỰC TẾ (backward-compat) ===== -->
+      ${!a.problemsSolved && a.useCases && a.useCases.length > 0 ? `
         <div class="detail-section">
           <div class="detail-section__title">🎯 Ứng dụng thực tế</div>
           <div class="detail-usecases-list">
@@ -915,14 +1040,10 @@ class App {
         </div>
       ` : ''}
 
-      <!-- ===== BẮT ĐẦU NHANH ===== -->
-      ${a.quickStart ? `
-        <div class="detail-quickstart">
-          <span class="detail-quickstart__icon">🚀</span>
-          <div>
-            <div class="detail-quickstart__title">Bắt đầu nhanh</div>
-            <div class="detail-quickstart__content">${a.quickStart}</div>
-          </div>
+      <!-- ===== ĐIỂM MẤU CHỐT ===== -->
+      ${a.keyTakeaway ? `
+        <div class="detail-takeaway">
+          <div class="detail-takeaway__content">${a.keyTakeaway}</div>
         </div>
       ` : ''}
 
@@ -1545,7 +1666,7 @@ class App {
           type: 'repo',
           icon: '📦',
           title: repo.name,
-          desc: repo.description?.substring(0, 60) || cat.name,
+          desc: repo.description || cat.name,
           badge: cat.name,
           action: () => { this.showDetail(repo); document.getElementById('cmdPalette').classList.remove('open'); }
         });
