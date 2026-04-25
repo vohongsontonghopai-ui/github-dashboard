@@ -1212,6 +1212,12 @@ class App {
   // ---- Modals ----
   openModal(id) {
     document.getElementById(id).classList.add('open');
+    // Auto-select active category in repo modal
+    if (id === 'addRepoModal') {
+      const sel = document.getElementById('modalCategorySelect');
+      const target = this.selectedCategory || (this.data.categories[0]?.id ?? '');
+      if (target && sel) sel.value = target;
+    }
   }
 
   closeModal(id) {

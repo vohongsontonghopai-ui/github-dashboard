@@ -373,7 +373,7 @@ FORMAT: Chỉ trả về JSON thuần, KHÔNG markdown, KHÔNG backticks.`
     // --- Key Features ---
     const keyFeatures = extractedFeatures.length > 0
       ? extractedFeatures
-      : this._buildKeyFeaturesFromMetadata(lang, topics, repoInfo);
+      : this._buildFeaturesFromMetadata(lang, topics, repoInfo).map(f => ({ name: f.name_vi, nameEn: f.name_en, icon: f.icon, description: f.explanation }));
 
     // --- Installation ---
     const installation = installMethods.length > 0
@@ -441,6 +441,163 @@ FORMAT: Chỉ trả về JSON thuần, KHÔNG markdown, KHÔNG backticks.`
       quickStart: installation.methods[0]?.steps?.[0] || `git clone https://github.com/${repoInfo.fullName}`,
       _fallback: true
     };
+  }
+
+  /**
+   * Extract key features — adapts _extractFeaturesFromReadme to the format expected by fallbackAnalysis
+   */
+  _extractKeyFeatures(readme, name) {
+    return this._extractFeaturesFromReadme(readme, name).map(f => ({
+      name: f.name_vi || f.name_en,
+      nameEn: f.name_en,
+      icon: f.icon,
+      description: f.explanation || ''
+    }));
+  }
+
+  /**
+   * Extract problems/pain points from README and description
+   */
+  _extractProblems(readme, desc) {
+    if (!readme || readme.length < 50) return [];
+    const problems = [];
+    const icons = ['🔥', '⚠️', '💢', '🚧'];
+
+    // Look for "Why" / "Motivation" / "Problem" sections
+    const section = readme.match(/##?\s*(?:Why|Motivation|Problem|Background|Vấn đề)[^\n]*\n([\s\S]*?)(?=\n##|\n---|\Z)/i);
+    if (section) {
+      const bullets = section[1].match(/[-*]\s+([^\n]+)/g) || [];
+      bullets.slice(0, 4).forEach((b, i) => {
+        let text = b.replace(/^[-*]\s+/, '').replace(/\*+/g, '').trim();
+        if (text.length > 8 && text.length < 120) {
+          problems.push({ problem: text, icon: icons[i % icons.length], explanation: '' });
+        }
+      });
+    }
+    return problems;
+  }
+
+  /**
+   * Extract installation methods from README
+   */
+  _extractInstallMethods(readme) {
+    if (!readme) return [];
+    const methods = [];
+    const patterns = [
+      { name: 'npm', regex: /```(?:bash|sh|shell)?\s*\n(npm\s+install[^`]+)/i },
+      { name: 'yarn', regex: /```(?:bash|sh|shell)?\s*\n(yarn\s+add[^`]+)/i },
+      { name: 'pnpm', regex: /```(?:bash|sh|shell)?\s*\n(pnpm\s+(?:add|install)[^`]+)/i },
+      { name: 'pip', regex: /```(?:bash|sh|shell)?\s*\n(pip\s+install[^`]+)/i },
+      { name: 'cargo', regex: /```(?:bash|sh|shell)?\s*\n(cargo\s+(?:add|install)[^`]+)/i },
+      { name: 'Docker', regex: /```(?:bash|sh|shell|dockerfile)?\s*\n(docker\s+(?:run|pull|compose)[^`]+)/i },
+      { name: 'Git Clone', regex: /```(?:bash|sh|shell)?\s*\n(git\s+clone[^`]+)/i },
+    ];
+
+    for (const p of patterns) {
+      const m = readme.match(p.regex);
+      if (m) {
+        methods.push({
+          name: `Cài đặt qua ${p.name}`,
+          steps: m[1].trim().split('\n').map(s => s.trim()).filter(Boolean),
+          recommended: methods.length === 0
+        });
+      }
+    }
+    return methods;
+  }
+
+  /**
+   * Extract components/modules from README
+   */
+  _extractComponents(readme, name) {
+    if (!readme || readme.length < 100) return [];
+    const components = [];
+
+    // Look for h2/h3 headers that look like component names
+    const headers = readme.match(/^#{2,3}\s+([^\n#]+)/gm) || [];
+    const skipWords = ['install', 'usage', 'license', 'contributing', 'getting started', 'table of contents', 'features', 'overview', 'about', 'introduction', 'prerequisites', 'requirements'];
+
+    headers.slice(0, 8).forEach(h => {
+      let text = h.replace(/^#{2,3}\s+/, '').replace(/\*+/g, '').trim();
+      if (text.length > 2 && text.length < 60 && !skipWords.some(w => text.toLowerCase().includes(w))) {
+        components.push({ name: text, description: '' });
+      }
+    });
+
+    return components.slice(0, 5);
+  }
+
+  /**
+   * Extract effectiveness claims from README
+   */
+  _extractEffectiveness(readme) {
+    if (!readme) return [];
+    const claims = [];
+
+    // Look for performance/benchmark numbers
+    const perfMatches = readme.match(/(?:\d+[x%]\s+(?:faster|smaller|better|improvement|reduction)|(?:faster|smaller|better)\s+(?:than|by)\s+\d+)/gi) || [];
+    perfMatches.slice(0, 3).forEach(m => claims.push(m.trim()));
+
+    // Look for stats like "Used by X companies"
+    const usageStats = readme.match(/(?:used by|trusted by|serving|powering)\s+[\d,k+]+\s+(?:\w+)/gi) || [];
+    usageStats.slice(0, 2).forEach(m => claims.push(m.trim()));
+
+    return claims;
+  }
+
+  /**
+   * Guess target audience from description and topics
+   */
+  _guessTargetAudience(desc, topics, lang) {
+    const descLower = (desc || '').toLowerCase();
+    const topicsLower = topics.map(t => t.toLowerCase());
+
+    if (descLower.includes('beginner') || descLower.includes('learning') || descLower.includes('tutorial')) {
+      return 'Người mới học lập trình và developer muốn tìm hiểu thêm.';
+    }
+    if (topicsLower.some(t => ['devops', 'kubernetes', 'docker', 'infrastructure'].includes(t))) {
+      return 'DevOps engineers và system administrators.';
+    }
+    if (topicsLower.some(t => ['ai', 'machine-learning', 'deep-learning', 'llm'].includes(t))) {
+      return 'AI/ML engineers và data scientists.';
+    }
+    if (topicsLower.some(t => ['react', 'vue', 'angular', 'frontend', 'ui', 'css'].includes(t))) {
+      return 'Frontend developers và UI/UX designers.';
+    }
+    if (topicsLower.some(t => ['api', 'backend', 'server', 'database'].includes(t))) {
+      return 'Backend developers và software engineers.';
+    }
+    if (lang) {
+      return `Developers sử dụng ${lang} và cộng đồng mã nguồn mở.`;
+    }
+    return 'Developers và cộng đồng mã nguồn mở.';
+  }
+
+  /**
+   * Build problems from description when README extraction fails
+   */
+  _buildProblemsFromDesc(desc, topics, name) {
+    const problems = [];
+    const descLower = (desc || '').toLowerCase();
+
+    if (descLower.includes('fast') || descLower.includes('performance') || descLower.includes('speed')) {
+      problems.push({ problem: 'Hiệu suất chậm của các giải pháp hiện có', icon: '⚡', explanation: `${name} giải quyết vấn đề tốc độ và hiệu suất.` });
+    }
+    if (descLower.includes('simple') || descLower.includes('easy') || descLower.includes('lightweight')) {
+      problems.push({ problem: 'Phức tạp khi sử dụng các công cụ hiện tại', icon: '🎯', explanation: `${name} đơn giản hóa quy trình.` });
+    }
+    if (descLower.includes('automat') || descLower.includes('workflow')) {
+      problems.push({ problem: 'Công việc lặp đi lặp lại tốn thời gian', icon: '🤖', explanation: `${name} tự động hóa quy trình.` });
+    }
+
+    if (problems.length === 0 && desc) {
+      problems.push({ problem: `Cung cấp giải pháp: ${desc}`, icon: '💡', explanation: '' });
+    }
+    if (problems.length === 0) {
+      problems.push({ problem: `${name} giải quyết một nhu cầu cụ thể trong cộng đồng developer`, icon: '🔧', explanation: '' });
+    }
+
+    return problems;
   }
 
   /**
