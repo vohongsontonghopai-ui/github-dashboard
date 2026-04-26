@@ -604,8 +604,8 @@ class App {
     const spinnerEl = document.getElementById(formType === 'quick' ? 'quickAddSpinner' : 'modalSpinner');
     const textEl = document.getElementById(formType === 'quick' ? 'quickAddText' : 'modalSubmitText');
 
-    spinnerEl.style.display = 'inline-block';
-    textEl.textContent = 'Đang phân tích...';
+    if (spinnerEl) spinnerEl.style.display = 'inline-block';
+    if (textEl) textEl.textContent = 'Đang phân tích...';
 
     try {
       // 1. Fetch from GitHub
@@ -619,7 +619,7 @@ class App {
       }
 
       // 3. AI Analysis
-      textEl.textContent = 'AI đang phân tích...';
+      if (textEl) textEl.textContent = 'AI đang phân tích...';
       const analysis = await aiAnalyzer.analyze(repoInfo, this.data.settings?.openrouterApiKey);
 
       // 4. Save
@@ -658,13 +658,14 @@ class App {
       }
 
       // Clear form
-      document.getElementById(formType === 'quick' ? 'quickUrlInput' : 'modalUrlInput').value = '';
+      const urlInput = document.getElementById(formType === 'quick' ? 'quickUrlInput' : 'modalUrlInput');
+      if (urlInput) urlInput.value = '';
 
     } catch (err) {
       this.toast.show(err.message, 'error');
     } finally {
-      spinnerEl.style.display = 'none';
-      textEl.textContent = 'Phân tích & Thêm';
+      if (spinnerEl) spinnerEl.style.display = 'none';
+      if (textEl) textEl.textContent = 'Phân tích & Thêm';
     }
   }
 
