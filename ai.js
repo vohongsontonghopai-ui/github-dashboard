@@ -101,6 +101,7 @@ class AIAnalyzer {
    */
   async analyze(repoInfo, apiKey) {
     if (!apiKey) {
+      console.warn('No OpenRouter API key provided, using fallback analysis');
       return this.fallbackAnalysis(repoInfo);
     }
 
@@ -237,6 +238,12 @@ FORMAT: Chỉ trả về JSON thuần, KHÔNG markdown, KHÔNG backticks.`
       if (!resp.ok) {
         const errData = await resp.json().catch(() => ({}));
         console.warn('OpenRouter API error:', resp.status, errData);
+        if (resp.status === 401) {
+          throw new Error('API_KEY_INVALID');
+        }
+        if (resp.status === 402) {
+          throw new Error('API_KEY_NO_CREDITS');
+        }
         return this.fallbackAnalysis(repoInfo);
       }
 
@@ -249,6 +256,10 @@ FORMAT: Chỉ trả về JSON thuần, KHÔNG markdown, KHÔNG backticks.`
 
       return this.parseAIResponse(content, repoInfo);
     } catch (err) {
+      // Re-throw API key errors so app.js can show clear message
+      if (err.message === 'API_KEY_INVALID' || err.message === 'API_KEY_NO_CREDITS') {
+        throw err;
+      }
       console.warn('AI analysis failed:', err);
       return this.fallbackAnalysis(repoInfo);
     }

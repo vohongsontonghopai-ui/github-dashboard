@@ -21,7 +21,7 @@ class StorageManager {
       ],
       settings: {
         theme: 'dark',
-        openrouterApiKey: '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'
+        openrouterApiKey: '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'
       }
     };
   }
@@ -85,7 +85,7 @@ class ToastManager {
   }
 
   show(message, type = 'info', duration = 3500) {
-    const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+    const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
     const toast = document.createElement('div');
     toast.className = `toast toast--${type}`;
     toast.innerHTML = `
@@ -620,7 +620,20 @@ class App {
 
       // 3. AI Analysis
       if (textEl) textEl.textContent = 'AI đang phân tích...';
-      const analysis = await aiAnalyzer.analyze(repoInfo, this.data.settings?.openrouterApiKey);
+      let analysis;
+      let aiWarning = '';
+      try {
+        analysis = await aiAnalyzer.analyze(repoInfo, this.data.settings?.openrouterApiKey);
+      } catch (aiErr) {
+        if (aiErr.message === 'API_KEY_INVALID') {
+          aiWarning = '⚠️ API key không hợp lệ hoặc đã hết hạn. Dùng phân tích cơ bản.';
+        } else if (aiErr.message === 'API_KEY_NO_CREDITS') {
+          aiWarning = '⚠️ API key hết credit. Dùng phân tích cơ bản.';
+        } else {
+          aiWarning = '⚠️ AI phân tích thất bại. Dùng phân tích cơ bản.';
+        }
+        analysis = aiAnalyzer.fallbackAnalysis(repoInfo);
+      }
 
       // 4. Save
       const newRepo = {
@@ -650,7 +663,12 @@ class App {
       // 5. Update UI
       this.renderSidebar();
       this.renderMindMap();
-      this.toast.show(`Đã thêm ${repoInfo.name} vào ${category.name}`, 'success');
+
+      if (aiWarning) {
+        this.toast.show(`Đã thêm ${repoInfo.name}. ${aiWarning}`, 'warning');
+      } else {
+        this.toast.show(`Đã thêm ${repoInfo.name} vào ${category.name}`, 'success');
+      }
 
       // Close modal if open
       if (formType === 'modal') {
@@ -1276,11 +1294,14 @@ class App {
     document.getElementById('addCategoryBtn').addEventListener('click', () => {
       document.getElementById('categoryModalTitle').textContent = 'Thêm Danh mục';
       document.getElementById('categoryNameInput').value = '';
-      document.getElementById('categoryIconInput').value = '';
+      document.getElementById('categoryIconInput').value = '📁';
       document.getElementById('editCategoryId').value = '';
       document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
       document.querySelector('.color-swatch[data-color="#2eaadc"]').classList.add('selected');
       document.getElementById('categoryColorInput').value = '#2eaadc';
+      document.querySelectorAll('.emoji-item').forEach(e => e.classList.remove('selected'));
+      const defaultEmoji = document.querySelector('.emoji-item[data-emoji="📁"]');
+      if (defaultEmoji) defaultEmoji.classList.add('selected');
       this.openModal('addCategoryModal');
     });
 
@@ -1302,6 +1323,15 @@ class App {
       document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
       swatch.classList.add('selected');
       document.getElementById('categoryColorInput').value = swatch.dataset.color;
+    });
+
+    // Emoji picker
+    document.getElementById('emojiPicker').addEventListener('click', (e) => {
+      const item = e.target.closest('.emoji-item');
+      if (!item) return;
+      document.querySelectorAll('.emoji-item').forEach(el => el.classList.remove('selected'));
+      item.classList.add('selected');
+      document.getElementById('categoryIconInput').value = item.dataset.emoji;
     });
 
     // Category list clicks
@@ -1340,6 +1370,9 @@ class App {
           document.getElementById('categoryIconInput').value = cat.icon;
           document.getElementById('editCategoryId').value = cat.id;
           document.getElementById('categoryColorInput').value = cat.color;
+          document.querySelectorAll('.emoji-item').forEach(el => {
+            el.classList.toggle('selected', el.dataset.emoji === cat.icon);
+          });
           document.querySelectorAll('.color-swatch').forEach(s => {
             s.classList.toggle('selected', s.dataset.color === cat.color);
           });
