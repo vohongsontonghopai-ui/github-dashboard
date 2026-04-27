@@ -2580,6 +2580,13 @@ body {
   line-height: 28px !important;
 }
 
+/* Sidebar inputs: smaller font to show more text (URLs are long) */
+.sidebar .input {
+  font-size: 12px !important;
+  font-family: var(--font-mono) !important;
+  letter-spacing: -0.3px;
+}
+
 .input:focus, .select:focus {
   border-bottom-color: var(--accent-red) !important;
   box-shadow: none !important;

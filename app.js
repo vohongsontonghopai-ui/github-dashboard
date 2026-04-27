@@ -552,18 +552,20 @@ class App {
     const zoomControls = document.getElementById('zoomControls');
 
     if (!hasRepos) {
-      emptyState.style.display = 'flex';
-      zoomControls.style.display = 'none';
+      if (emptyState) emptyState.style.display = 'flex';
+      if (zoomControls) zoomControls.style.display = 'none';
       // Clear SVG if exists
       const container = document.getElementById('mindmapContainer');
-      const svg = container.querySelector('svg');
-      if (svg) svg.remove();
+      if (container) {
+        const svg = container.querySelector('svg');
+        if (svg) svg.remove();
+      }
       this.mindMap.svg = null;
       return;
     }
 
-    emptyState.style.display = 'none';
-    zoomControls.style.display = 'flex';
+    if (emptyState) emptyState.style.display = 'none';
+    if (zoomControls) zoomControls.style.display = 'flex';
 
     this.mindMap.render(this.data.categories, this.searchTerm);
   }
@@ -584,7 +586,10 @@ class App {
       </li>
     `).join('');
 
-    // Category select options
+    // Category select options — preserve current selection
+    const quickVal = quickSelect.value;
+    const modalVal = modalSelect.value;
+
     const options = '<option value="">— Chọn danh mục —</option>' +
       this.data.categories.map(cat =>
         `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`
@@ -592,6 +597,9 @@ class App {
 
     quickSelect.innerHTML = options;
     modalSelect.innerHTML = options;
+
+    if (quickVal) quickSelect.value = quickVal;
+    if (modalVal) modalSelect.value = modalVal;
   }
 
   // ---- Add Repo ----
@@ -1185,7 +1193,8 @@ class App {
   }
 
   closeDetail() {
-    document.getElementById('detailPanel').classList.remove('open');
+    const dp = document.getElementById('detailPanel');
+    if (dp) dp.classList.remove('open');
   }
 
   // ---- Context Menu ----
@@ -1211,6 +1220,7 @@ class App {
       `;
     }
 
+    if (!menu) return;
     menu.innerHTML = items;
     menu.style.display = 'block';
     menu.style.left = event.pageX + 'px';
@@ -1218,7 +1228,8 @@ class App {
   }
 
   hideContextMenu() {
-    document.getElementById('contextMenu').style.display = 'none';
+    const cm = document.getElementById('contextMenu');
+    if (cm) cm.style.display = 'none';
   }
 
   findCategoryOfRepo(repoId) {
@@ -1230,7 +1241,9 @@ class App {
 
   // ---- Modals ----
   openModal(id) {
-    document.getElementById(id).classList.add('open');
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('open');
     // Auto-select active category in repo modal
     if (id === 'addRepoModal') {
       const sel = document.getElementById('modalCategorySelect');
@@ -1240,7 +1253,8 @@ class App {
   }
 
   closeModal(id) {
-    document.getElementById(id).classList.remove('open');
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('open');
   }
 
   // ---- Save ----
@@ -1258,7 +1272,7 @@ class App {
 
     // Sidebar toggle
     document.getElementById('toggleSidebar').addEventListener('click', () => {
-      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebar')?.classList.toggle('open');
     });
 
     // Search
@@ -1267,10 +1281,14 @@ class App {
       this.renderMindMap();
     });
 
+    // Quick add — show full URL as tooltip
+    const quickUrlEl = document.getElementById('quickUrlInput');
+    quickUrlEl.addEventListener('input', () => { quickUrlEl.title = quickUrlEl.value; });
+
     // Quick add form
     document.getElementById('quickAddForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const url = document.getElementById('quickUrlInput').value;
+      const url = quickUrlEl.value;
       const catId = document.getElementById('quickCategorySelect').value;
       await this.addRepo(url, catId, 'quick');
     });
@@ -1292,13 +1310,18 @@ class App {
 
     // Add category button
     document.getElementById('addCategoryBtn').addEventListener('click', () => {
-      document.getElementById('categoryModalTitle').textContent = 'Thêm Danh mục';
-      document.getElementById('categoryNameInput').value = '';
-      document.getElementById('categoryIconInput').value = '📁';
-      document.getElementById('editCategoryId').value = '';
+      const catModalTitle = document.getElementById('categoryModalTitle');
+      if (catModalTitle) catModalTitle.textContent = 'Thêm Danh mục';
+      const catNameInput = document.getElementById('categoryNameInput');
+      if (catNameInput) catNameInput.value = '';
+      const catIconInput = document.getElementById('categoryIconInput');
+      if (catIconInput) catIconInput.value = '📁';
+      const editCatId = document.getElementById('editCategoryId');
+      if (editCatId) editCatId.value = '';
       document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
-      document.querySelector('.color-swatch[data-color="#2eaadc"]').classList.add('selected');
-      document.getElementById('categoryColorInput').value = '#2eaadc';
+      document.querySelector('.color-swatch[data-color="#2eaadc"]')?.classList.add('selected');
+      const catColorInput = document.getElementById('categoryColorInput');
+      if (catColorInput) catColorInput.value = '#2eaadc';
       document.querySelectorAll('.emoji-item').forEach(e => e.classList.remove('selected'));
       const defaultEmoji = document.querySelector('.emoji-item[data-emoji="📁"]');
       if (defaultEmoji) defaultEmoji.classList.add('selected');
@@ -1322,7 +1345,8 @@ class App {
       if (!swatch) return;
       document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
       swatch.classList.add('selected');
-      document.getElementById('categoryColorInput').value = swatch.dataset.color;
+      const colorInput = document.getElementById('categoryColorInput');
+      if (colorInput) colorInput.value = swatch.dataset.color;
     });
 
     // Emoji picker
@@ -1331,7 +1355,8 @@ class App {
       if (!item) return;
       document.querySelectorAll('.emoji-item').forEach(el => el.classList.remove('selected'));
       item.classList.add('selected');
-      document.getElementById('categoryIconInput').value = item.dataset.emoji;
+      const iconInput = document.getElementById('categoryIconInput');
+      if (iconInput) iconInput.value = item.dataset.emoji;
     });
 
     // Category list clicks
@@ -1365,11 +1390,16 @@ class App {
       if (action === 'editCat') {
         const cat = this.data.categories.find(c => c.id === btn.dataset.id);
         if (cat) {
-          document.getElementById('categoryModalTitle').textContent = 'Sửa Danh mục';
-          document.getElementById('categoryNameInput').value = cat.name;
-          document.getElementById('categoryIconInput').value = cat.icon;
-          document.getElementById('editCategoryId').value = cat.id;
-          document.getElementById('categoryColorInput').value = cat.color;
+          const catTitle = document.getElementById('categoryModalTitle');
+          if (catTitle) catTitle.textContent = 'Sửa Danh mục';
+          const nameInput = document.getElementById('categoryNameInput');
+          if (nameInput) nameInput.value = cat.name;
+          const iconInput = document.getElementById('categoryIconInput');
+          if (iconInput) iconInput.value = cat.icon;
+          const editId = document.getElementById('editCategoryId');
+          if (editId) editId.value = cat.id;
+          const colorInput = document.getElementById('categoryColorInput');
+          if (colorInput) colorInput.value = cat.color;
           document.querySelectorAll('.emoji-item').forEach(el => {
             el.classList.toggle('selected', el.dataset.emoji === cat.icon);
           });
@@ -1474,7 +1504,7 @@ class App {
     document.getElementById('compareFabBtn')?.addEventListener('click', () => this.showCompareModal());
     document.getElementById('compareFabClear')?.addEventListener('click', () => this.clearCompare());
     document.getElementById('closeCompareBtn')?.addEventListener('click', () => {
-      document.getElementById('compareModal').classList.remove('open');
+      document.getElementById('compareModal')?.classList.remove('open');
     });
 
     // Command palette overlay click
@@ -1557,9 +1587,10 @@ class App {
   updateCompareFab() {
     const fab = document.getElementById('compareFab');
     const count = document.getElementById('compareFabCount');
+    if (!fab) return;
     if (this.compareSet.size > 0) {
       fab.style.display = 'flex';
-      count.textContent = this.compareSet.size;
+      if (count) count.textContent = this.compareSet.size;
     } else {
       fab.style.display = 'none';
     }
@@ -1639,7 +1670,7 @@ class App {
     tableHTML += '</tbody></table>';
     body.innerHTML = tableHTML;
 
-    document.getElementById('compareModal').classList.add('open');
+    document.getElementById('compareModal')?.classList.add('open');
   }
 
   // ==============================
@@ -1708,7 +1739,7 @@ class App {
           title: repo.name,
           desc: repo.description || cat.name,
           badge: cat.name,
-          action: () => { this.showDetail(repo); document.getElementById('cmdPalette').classList.remove('open'); }
+          action: () => { this.showDetail(repo); document.getElementById('cmdPalette')?.classList.remove('open'); }
         });
       });
     });
@@ -1724,18 +1755,18 @@ class App {
         action: () => {
           this.selectedCategory = cat.id;
           this.renderSidebar();
-          document.getElementById('cmdPalette').classList.remove('open');
+          document.getElementById('cmdPalette')?.classList.remove('open');
         }
       });
     });
 
     // Actions
     const actions = [
-      { icon: '＋', title: 'Thêm Repo mới', desc: 'Mở form thêm repo', badge: 'Thao tác', action: () => { this.openModal('addRepoModal'); document.getElementById('cmdPalette').classList.remove('open'); } },
-      { icon: '📁', title: 'Thêm Danh mục', desc: 'Tạo danh mục mới', badge: 'Thao tác', action: () => { document.getElementById('categoryModalTitle').textContent = 'Thêm Danh mục'; document.getElementById('editCategoryId').value = ''; this.openModal('addCategoryModal'); document.getElementById('cmdPalette').classList.remove('open'); } },
-      { icon: '📤', title: 'Xuất dữ liệu', desc: 'Export JSON', badge: 'Thao tác', action: () => { this.storage.exportJSON(this.data); this.toast.show('Đã xuất dữ liệu', 'success'); document.getElementById('cmdPalette').classList.remove('open'); } },
-      { icon: '📊', title: 'So sánh repos', desc: `${this.compareSet?.size || 0} repos đã chọn`, badge: 'Thao tác', action: () => { this.showCompareModal(); document.getElementById('cmdPalette').classList.remove('open'); } },
-      { icon: '🌙', title: 'Chuyển theme', desc: 'Dark/Light mode', badge: 'Thao tác', action: () => { this.toggleTheme(); document.getElementById('cmdPalette').classList.remove('open'); } },
+      { icon: '＋', title: 'Thêm Repo mới', desc: 'Mở form thêm repo', badge: 'Thao tác', action: () => { this.openModal('addRepoModal'); document.getElementById('cmdPalette')?.classList.remove('open'); } },
+      { icon: '📁', title: 'Thêm Danh mục', desc: 'Tạo danh mục mới', badge: 'Thao tác', action: () => { const catTitle = document.getElementById('categoryModalTitle'); if (catTitle) catTitle.textContent = 'Thêm Danh mục'; const editCatId = document.getElementById('editCategoryId'); if (editCatId) editCatId.value = ''; this.openModal('addCategoryModal'); document.getElementById('cmdPalette')?.classList.remove('open'); } },
+      { icon: '📤', title: 'Xuất dữ liệu', desc: 'Export JSON', badge: 'Thao tác', action: () => { this.storage.exportJSON(this.data); this.toast.show('Đã xuất dữ liệu', 'success'); document.getElementById('cmdPalette')?.classList.remove('open'); } },
+      { icon: '📊', title: 'So sánh repos', desc: `${this.compareSet?.size || 0} repos đã chọn`, badge: 'Thao tác', action: () => { this.showCompareModal(); document.getElementById('cmdPalette')?.classList.remove('open'); } },
+      { icon: '🌙', title: 'Chuyển theme', desc: 'Dark/Light mode', badge: 'Thao tác', action: () => { this.toggleTheme(); document.getElementById('cmdPalette')?.classList.remove('open'); } },
     ];
     actions.forEach(a => allItems.push({ ...a, type: 'action' }));
 
