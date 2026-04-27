@@ -106,7 +106,7 @@ class AIAnalyzer {
     }
 
     const readmeSnippet = repoInfo.readme
-      ? repoInfo.readme.substring(0, 6000)
+      ? repoInfo.readme.substring(0, 10000)
       : 'Không có README';
 
     const prompt = `Phân tích CHUYÊN SÂU GitHub repository sau. Đọc kỹ README để THỰC SỰ HIỂU dự án này làm gì, giải quyết vấn đề gì, hoạt động thế nào.
@@ -129,34 +129,34 @@ TOÀN BỘ nội dung phải bằng TIẾNG VIỆT (trừ tên riêng, câu lệ
 Viết như đang giải thích cho bạn bè hiểu — thân thiện, rõ ràng, có ví dụ cụ thể.
 
 {
-  "quickSummary": "📌 Tóm lại: [1-2 câu ngắn nhất mô tả dự án này LÀ GÌ và DÙNG ĐỂ LÀM GÌ]",
+  "quickSummary": "📌 Tóm lại: [1-2 câu mô tả dự án này LÀ GÌ và DÙNG ĐỂ LÀM GÌ — viết rõ ràng, cụ thể]",
 
   "overview": {
-    "purpose": "Giải thích rõ ràng mục đích chính của dự án trong 3-5 câu. Phải trả lời được: Dự án này sinh ra để làm gì? Ai tạo ra nó và tại sao?",
+    "purpose": "Giải thích MỤC ĐÍCH CHÍNH của dự án trong 4-6 câu DÀI. Phải trả lời: Dự án sinh ra để làm gì? Ai tạo ra? Phiên bản trước có gì hạn chế? Phiên bản này cải tiến thế nào? Mục tiêu cuối cùng là gì?",
     "components": [
       {
-        "name": "Tên file hoặc module chính (vd: CLAUDE.md)",
-        "description": "Giải thích file/module này chứa gì, vai trò của nó trong dự án"
+        "name": "Tên module/thành phần chính",
+        "description": "Giải thích 2-3 câu: module này chứa gì, vai trò trong dự án, tại sao quan trọng"
       }
     ],
-    "targetAudience": "Dự án này dành cho ai? Ai nên quan tâm và tại sao?"
+    "targetAudience": "Mô tả CHI TIẾT 2-3 câu: Dự án dành cho ai? Cần kiến thức gì? Tại sao họ nên quan tâm?"
   },
 
   "problemsSolved": [
     {
       "problem": "Tên vấn đề ngắn gọn bằng tiếng Việt",
-      "explanation": "Giải thích vấn đề này là gì, tại sao nó quan trọng. 2-3 câu.",
-      "example": "Ví dụ cụ thể, dễ hiểu trong đời thường hoặc khi lập trình",
+      "explanation": "Giải thích CHUYÊN SÂU vấn đề này trong 3-5 câu: vấn đề là gì, tại sao nó quan trọng, hậu quả nếu không giải quyết, dự án giải quyết bằng cách nào.",
+      "example": "Ví dụ CỤ THỂ, SINH ĐỘNG trong đời thường hoặc khi lập trình. Viết ít nhất 3-4 câu, kể một câu chuyện nhỏ có tình huống → vấn đề → hậu quả.",
       "icon": "emoji phù hợp"
     }
   ],
 
   "keyFeatures": [
     {
-      "name": "Tên tính năng/nguyên tắc bằng tiếng Việt",
+      "name": "Tên tính năng bằng tiếng Việt (ngắn gọn, dễ hiểu)",
       "nameEn": "Tên gốc tiếng Anh (nếu có)",
-      "description": "Giải thích CHI TIẾT tính năng này làm gì, hoạt động thế nào. 3-5 câu.",
-      "example": "Ví dụ cụ thể minh họa cách dùng hoặc cách nó hoạt động",
+      "description": "Giải thích CHI TIẾT tính năng trong 4-6 câu: nó làm gì? hoạt động thế nào? khác biệt gì so với cách truyền thống? tại sao hữu ích?",
+      "example": "Ví dụ CỤ THỂ minh họa cách dùng hoặc cách hoạt động. Viết 2-3 câu có tình huống thực tế.",
       "icon": "emoji phù hợp"
     }
   ],
@@ -165,42 +165,46 @@ Viết như đang giải thích cho bạn bè hiểu — thân thiện, rõ ràn
     "methods": [
       {
         "name": "Tên phương pháp cài đặt (tiếng Việt)",
-        "steps": ["Bước 1: ...", "Bước 2: ..."],
+        "steps": ["Bước 1: Mô tả rõ ràng", "Bước 2: ...", "Bước 3: Lưu ý quan trọng nếu có"],
         "recommended": true
       }
     ]
   },
 
   "effectiveness": [
-    "Dấu hiệu 1 cho thấy dự án hoạt động hiệu quả",
-    "Dấu hiệu 2...",
-    "Dấu hiệu 3..."
+    "Dấu hiệu CỤ THỂ cho thấy dự án hoạt động hiệu quả — mỗi dấu hiệu phải là 1 câu hoàn chỉnh",
+    "Dấu hiệu 2: viết chi tiết, dựa trên README",
+    "Dấu hiệu 3...",
+    "Dấu hiệu 4...",
+    "Dấu hiệu 5..."
   ],
 
-  "customization": "Hướng dẫn ngắn cách tùy chỉnh dự án cho phù hợp nhu cầu cá nhân. 2-3 câu.",
+  "customization": "Hướng dẫn 3-4 câu cách tùy chỉnh dự án cho phù hợp nhu cầu cá nhân.",
 
-  "keyTakeaway": "💡 Điểm chính cần nhớ: [Tóm tắt bản chất dự án trong 1-2 câu dễ nhớ]",
+  "keyTakeaway": "💡 Điểm chính cần nhớ: [Tóm tắt bản chất dự án trong 2-3 câu DỄ NHỚ, có giá trị]",
 
   "difficulty": {
     "level": "Dễ|Trung bình|Khó|Rất khó",
-    "description": "Giải thích ai nên dùng, cần kiến thức gì"
+    "description": "Giải thích 2-3 câu: ai nên dùng, cần kiến thức gì, mất bao lâu để bắt đầu"
   },
   "practicalValue": {
     "score": 1-10,
-    "reason": "Tại sao cho điểm này? Giá trị thực tế là gì?"
+    "reason": "Giải thích 2-3 câu: tại sao cho điểm này, giá trị thực tế cụ thể là gì"
   },
   "alternatives": ["Tool/lib tương tự 1", "Tool/lib tương tự 2"]
 }
 
-QUY TẮC QUAN TRỌNG:
-- overview.components: Liệt kê 3-5 thành phần/file chính của dự án, mỗi cái giải thích rõ vai trò
-- problemsSolved: 2-4 vấn đề, MỖI CÁI phải có ví dụ cụ thể dễ hiểu
-- keyFeatures: 3-6 tính năng CHÍNH, mỗi cái giải thích CHI TIẾT + có ví dụ
-- installation.methods: Ít nhất 1 cách cài đặt, trích từ README nếu có
-- effectiveness: 3-5 dấu hiệu cụ thể
-- KHÔNG viết chung chung. Phải dựa trên NỘI DUNG THỰC TẾ từ README
-- TOÀN BỘ bằng tiếng Việt (trừ tên riêng, code)
-- Viết thân thiện, dùng emoji hợp lý`;
+QUY TẮC VIẾT — TUÂN THỦ TUYỆT ĐỐI:
+1. KHÔNG ĐƯỢC VIẾT NGẮN. Mỗi trường description/explanation/example phải ít nhất 3 câu.
+2. overview.purpose: 4-6 câu, giải thích bối cảnh + lý do tồn tại + mục tiêu
+3. overview.components: 3-5 thành phần CHÍNH, mỗi cái 2-3 câu mô tả
+4. problemsSolved: 2-4 vấn đề, MỖI CÁI có explanation 3-5 câu + example 3-4 câu KỂ CÂU CHUYỆN
+5. keyFeatures: 4-6 tính năng, MỖI CÁI có description 4-6 câu + example 2-3 câu
+6. effectiveness: 4-5 dấu hiệu, mỗi dấu hiệu là 1 câu CỤ THỂ
+7. KHÔNG viết chung chung. Phải dựa trên NỘI DUNG THỰC TẾ từ README
+8. TOÀN BỘ bằng tiếng Việt (trừ tên riêng, code)
+9. Viết thân thiện, giáo dục, dùng emoji hợp lý, như viết blog công nghệ cho người Việt
+10. Mỗi ví dụ phải có TÌNH HUỐNG cụ thể, KHÔNG viết kiểu "ví dụ: sử dụng X để làm Y"`;
 
     try {
       const resp = await fetch(this.endpoint, {
@@ -236,8 +240,8 @@ FORMAT: Chỉ trả về JSON thuần, KHÔNG markdown, KHÔNG backticks.`
             },
             { role: 'user', content: prompt }
           ],
-          temperature: 0.3,
-          max_tokens: 4000
+          temperature: 0.4,
+          max_tokens: 8000
         })
       });
 
