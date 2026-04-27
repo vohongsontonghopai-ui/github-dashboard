@@ -218,12 +218,18 @@ QUY TẮC QUAN TRỌNG:
               role: 'system',
               content: `Bạn là chuyên gia phân tích và giải thích công nghệ hàng đầu. Nhiệm vụ của bạn là biến các repository GitHub thành BÀI REVIEW CÔNG NGHỆ CHUYÊN SÂU bằng tiếng Việt.
 
-NGUYÊN TẮC:
+NGUYÊN TẮC BẮT BUỘC:
 1. ĐỌC KỸ README — Phải thực sự hiểu dự án trước khi viết. Không đoán mò.
 2. GIẢI THÍCH NHƯ DẠY BẠN BÈ — Mỗi khái niệm kỹ thuật cần ví dụ đời thường.
 3. CỤ THỂ, KHÔNG CHUNG CHUNG — Thay vì "dự án hữu ích", viết cụ thể hữu ích thế nào.
-4. 100% TIẾNG VIỆT — Trừ tên riêng (React, Docker...), code snippet, thuật ngữ không thể dịch.
-5. CÓ VÍ DỤ — Mỗi vấn đề, mỗi tính năng phải có ví dụ thực tế.
+4. TUYỆT ĐỐI 100% TIẾNG VIỆT — Mọi giải thích, mô tả, lý do PHẢI viết bằng tiếng Việt. Chỉ giữ nguyên tiếng Anh cho: tên riêng (React, Docker, npm...), câu lệnh code, thuật ngữ kỹ thuật không thể dịch. KHÔNG ĐƯỢC viết câu tiếng Anh trong bất kỳ trường nào.
+5. CÓ VÍ DỤ — Mỗi vấn đề, mỗi tính năng phải có ví dụ thực tế bằng tiếng Việt.
+
+VÍ DỤ OUTPUT ĐÚNG (trường keyFeatures):
+{"name": "Xử lý bất đồng bộ siêu nhanh", "nameEn": "Async Processing", "description": "Cho phép xử lý hàng nghìn request cùng lúc mà không bị chậm. Giống như một nhà hàng có nhiều bếp trưởng nấu song song thay vì xếp hàng đợi từng món.", "example": "Khi người dùng tải lên 100 ảnh, thay vì xử lý từng ảnh một, hệ thống xử lý 10 ảnh cùng lúc.", "icon": "⚡"}
+
+VÍ DỤ SAI (KHÔNG ĐƯỢC VIẾT NHƯ NÀY):
+{"name": "Async Processing", "description": "Allows processing thousands of requests concurrently...", ...}
 
 PHONG CÁCH: Thân thiện, giáo dục, như đang viết blog công nghệ cho người Việt.
 FORMAT: Chỉ trả về JSON thuần, KHÔNG markdown, KHÔNG backticks.`
@@ -545,13 +551,27 @@ FORMAT: Chỉ trả về JSON thuần, KHÔNG markdown, KHÔNG backticks.`
     if (!readme) return [];
     const claims = [];
 
-    // Look for performance/benchmark numbers
+    // Look for performance/benchmark numbers and translate to Vietnamese
     const perfMatches = readme.match(/(?:\d+[x%]\s+(?:faster|smaller|better|improvement|reduction)|(?:faster|smaller|better)\s+(?:than|by)\s+\d+)/gi) || [];
-    perfMatches.slice(0, 3).forEach(m => claims.push(m.trim()));
+    const perfTranslations = { 'faster': 'nhanh hơn', 'smaller': 'nhỏ hơn', 'better': 'tốt hơn', 'improvement': 'cải thiện', 'reduction': 'giảm' };
+    perfMatches.slice(0, 3).forEach(m => {
+      let text = m.trim();
+      for (const [en, vi] of Object.entries(perfTranslations)) {
+        text = text.replace(new RegExp(en, 'gi'), vi);
+      }
+      claims.push(text);
+    });
 
-    // Look for stats like "Used by X companies"
+    // Look for stats like "Used by X companies" and translate
     const usageStats = readme.match(/(?:used by|trusted by|serving|powering)\s+[\d,k+]+\s+(?:\w+)/gi) || [];
-    usageStats.slice(0, 2).forEach(m => claims.push(m.trim()));
+    const usageTranslations = { 'used by': 'Được sử dụng bởi', 'trusted by': 'Được tin dùng bởi', 'serving': 'Phục vụ', 'powering': 'Hỗ trợ' };
+    usageStats.slice(0, 2).forEach(m => {
+      let text = m.trim();
+      for (const [en, vi] of Object.entries(usageTranslations)) {
+        text = text.replace(new RegExp(en, 'gi'), vi);
+      }
+      claims.push(text);
+    });
 
     return claims;
   }
@@ -628,7 +648,7 @@ FORMAT: Chỉ trả về JSON thuần, KHÔNG markdown, KHÔNG backticks.`
         if (text.length > 5 && text.length < 120) {
           features.push({
             name_en: text,
-            name_vi: text,
+            name_vi: this._viLabel(text),
             icon: featureIcons[i % featureIcons.length],
             explanation: ''
           });
@@ -644,7 +664,7 @@ FORMAT: Chỉ trả về JSON thuần, KHÔNG markdown, KHÔNG backticks.`
         if (text.length > 8 && text.length < 100 && !text.includes('http') && !text.includes('```')) {
           features.push({
             name_en: text,
-            name_vi: text,
+            name_vi: this._viLabel(text),
             icon: featureIcons[i % featureIcons.length],
             explanation: ''
           });
@@ -788,7 +808,7 @@ FORMAT: Chỉ trả về JSON thuần, KHÔNG markdown, KHÔNG backticks.`
       });
     }
 
-    // Create features from topics
+    // Create features from topics with Vietnamese labels
     const topicIcons = {
       'react': '⚛️', 'vue': '💚', 'angular': '🅰️', 'svelte': '🔶',
       'typescript': '🔷', 'python': '🐍', 'rust': '🦀', 'go': '🐹',
@@ -797,12 +817,21 @@ FORMAT: Chỉ trả về JSON thuần, KHÔNG markdown, KHÔNG backticks.`
       'security': '🛡️', 'performance': '⚡', 'automation': '🤖',
       'nextjs': '▲', 'nodejs': '💚', 'graphql': '◈', 'rest': '🔗'
     };
+    const topicViNames = {
+      'react': 'Thư viện React', 'vue': 'Framework Vue', 'angular': 'Framework Angular', 'svelte': 'Framework Svelte',
+      'typescript': 'Ngôn ngữ TypeScript', 'python': 'Ngôn ngữ Python', 'rust': 'Ngôn ngữ Rust', 'go': 'Ngôn ngữ Go',
+      'docker': 'Công nghệ Docker', 'kubernetes': 'Nền tảng Kubernetes', 'ai': 'Trí tuệ nhân tạo', 'machine-learning': 'Học máy',
+      'cli': 'Công cụ dòng lệnh', 'api': 'Giao diện lập trình API', 'database': 'Cơ sở dữ liệu', 'testing': 'Kiểm thử phần mềm',
+      'security': 'Bảo mật', 'performance': 'Hiệu suất cao', 'automation': 'Tự động hóa',
+      'nextjs': 'Framework Next.js', 'nodejs': 'Nền tảng Node.js', 'graphql': 'Ngôn ngữ truy vấn GraphQL', 'rest': 'API RESTful'
+    };
 
     topics.slice(0, 5).forEach(topic => {
       const icon = topicIcons[topic.toLowerCase()] || '🏷️';
+      const viName = topicViNames[topic.toLowerCase()] || `Công nghệ ${topic}`;
       features.push({
         name_en: topic,
-        name_vi: topic,
+        name_vi: viName,
         icon,
         explanation: ''
       });
@@ -891,6 +920,22 @@ FORMAT: Chỉ trả về JSON thuần, KHÔNG markdown, KHÔNG backticks.`
       if (altMap[key]) return altMap[key].filter(a => a.toLowerCase() !== name.toLowerCase()).slice(0, 3);
     }
     return [];
+  }
+
+  /**
+   * Simple Vietnamese label wrapper for extracted English text.
+   * Adds a "Tính năng: " prefix only if the text looks purely English.
+   */
+  _viLabel(text) {
+    if (!text) return '';
+    // If text already contains Vietnamese characters, return as-is
+    if (/[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(text)) {
+      return text;
+    }
+    // Short technical terms — keep as-is (e.g. "CLI", "API")
+    if (text.length < 15) return text;
+    // Otherwise prefix to indicate it's a feature description
+    return `Tính năng: ${text}`;
   }
 
   formatNumber(num) {
