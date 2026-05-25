@@ -2824,6 +2824,50 @@ body {
   transform: none !important;
 }
 
+/* --- Layout Controls: Crayon Buttons --- */
+.layout-controls {
+  position: absolute;
+  bottom: var(--space-xl);
+  left: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border: 2px solid var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-card) !important;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+}
+
+.layout-controls .btn {
+  border-radius: 0 !important;
+  width: 36px;
+  height: 36px;
+  background: var(--bg-card) !important;
+  color: var(--text-secondary);
+  font-size: 16px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: none !important;
+}
+
+.layout-controls .btn:hover {
+  background: var(--bg-hover) !important;
+  color: var(--text-primary);
+}
+
+.layout-controls .btn.btn--active {
+  background: var(--bg-active) !important;
+  color: var(--text-accent) !important;
+}
+
+[data-theme="light"] .layout-controls .btn.btn--active {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
 /* --- Command Palette: Notebook Search --- */
 .cmd-palette {
   border: 3px solid var(--border-default) !important;

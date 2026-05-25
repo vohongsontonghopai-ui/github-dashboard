@@ -119,6 +119,74 @@ class MindMap {
     this.nodeWidth = 220;
     this.nodeHeight = 110;
     this.duration = 400;
+    this.layoutMode = 'left-to-right';
+  }
+
+  getPos(d) {
+    if (this.layoutMode === 'bi-directional') {
+      if (d.depth === 0) return { x: d.x, y: 0 };
+      
+      let catNode = d;
+      while (catNode.parent && catNode.parent.depth > 0) {
+        catNode = catNode.parent;
+      }
+      
+      const categories = this.data.children || [];
+      const catIndex = categories.indexOf(catNode);
+      const isLeft = catIndex % 2 === 1;
+      
+      return {
+        x: d.x,
+        y: isLeft ? -d.y : d.y
+      };
+    } else if (this.layoutMode === 'radial') {
+      if (d.depth === 0) return { x: 0, y: 0 };
+      
+      const nodes = this.data.descendants();
+      const xMin = d3.min(nodes, n => n.x);
+      const xMax = d3.max(nodes, n => n.x);
+      const xRange = xMax - xMin || 1;
+      
+      const angle = ((d.x - xMin) / xRange) * 2 * Math.PI;
+      const radius = d.y * 0.8;
+      
+      return {
+        x: radius * Math.sin(angle),
+        y: radius * Math.cos(angle)
+      };
+    }
+    return { x: d.x, y: d.y };
+  }
+
+  updateCenter(animate = true) {
+    if (!this.svg || !this.g) return;
+    const rect = this.container.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    
+    let tx, ty;
+    if (this.layoutMode === 'bi-directional' || this.layoutMode === 'radial') {
+      tx = width / 2;
+      ty = height / 2;
+    } else {
+      tx = this.margin.left;
+      ty = height / 2;
+    }
+    
+    if (animate) {
+      this.g.transition().duration(this.duration)
+        .attr('transform', `translate(${tx}, ${ty})`);
+      this.svg.transition().duration(this.duration).call(
+        this.zoom.transform,
+        d3.zoomIdentity.translate(tx, ty)
+      );
+    } else {
+      this.g.attr('transform', `translate(${tx}, ${ty})`);
+      this.svg.call(
+        this.zoom.transform,
+        d3.zoomIdentity.translate(tx, ty)
+      );
+    }
   }
 
   init() {
@@ -235,6 +303,7 @@ class MindMap {
 
     this.data = root;
     this.update(root);
+    this.updateCenter(false); // Center instantly on initial render
   }
 
   update(source) {
@@ -253,8 +322,8 @@ class MindMap {
       .insert('path', 'g')
       .attr('class', 'link')
       .attr('d', () => {
-        const o = { x: source.x0 || source.x, y: source.y0 || source.y };
-        return this.diagonal({ x: o.x, y: o.y }, { x: o.x, y: o.y });
+        const parentPos = this.getPos(source);
+        return `M ${parentPos.y} ${parentPos.x} C ${parentPos.y} ${parentPos.x}, ${parentPos.y} ${parentPos.x}, ${parentPos.y} ${parentPos.x}`;
       })
       .style('opacity', 0);
 
@@ -274,8 +343,8 @@ class MindMap {
     // Exit
     link.exit().transition().duration(this.duration)
       .attr('d', () => {
-        const o = { x: source.x, y: source.y };
-        return this.diagonal({ x: o.x, y: o.y }, { x: o.x, y: o.y });
+        const parentPos = this.getPos(source);
+        return `M ${parentPos.y} ${parentPos.x} C ${parentPos.y} ${parentPos.x}, ${parentPos.y} ${parentPos.x}, ${parentPos.y} ${parentPos.x}`;
       })
       .style('opacity', 0)
       .remove();
@@ -288,7 +357,10 @@ class MindMap {
     const nodeEnter = node.enter()
       .append('g')
       .attr('class', 'node-group')
-      .attr('transform', `translate(${source.y0 || source.y}, ${source.x0 || source.x})`)
+      .attr('transform', d => {
+        const parentPos = this.getPos(source);
+        return `translate(${parentPos.y}, ${parentPos.x})`;
+      })
       .style('opacity', 0);
 
     // Add foreignObject for HTML cards
@@ -414,12 +486,31 @@ class MindMap {
     // Update + Enter transition
     const nodeMerge = nodeEnter.merge(node);
     nodeMerge.transition().duration(this.duration)
-      .attr('transform', d => `translate(${d.y}, ${d.x})`)
+      .attr('transform', d => {
+        const pos = this.getPos(d);
+        return `translate(${pos.y}, ${pos.x})`;
+      })
       .style('opacity', 1);
+
+    // Update foreignObject placement based on layout side
+    nodeMerge.select('foreignObject')
+      .attr('x', d => {
+        const pos = this.getPos(d);
+        const isLeft = pos.y < 0;
+        let cardWidth;
+        if (d.data.type === 'root') cardWidth = 220;
+        else if (d.data.type === 'category') cardWidth = 220;
+        else if (d.data.type === 'repo') cardWidth = 280;
+        else cardWidth = 240;
+        return isLeft ? -cardWidth - 10 : -10;
+      });
 
     // Exit
     node.exit().transition().duration(this.duration)
-      .attr('transform', `translate(${source.y}, ${source.x})`)
+      .attr('transform', d => {
+        const parentPos = this.getPos(source);
+        return `translate(${parentPos.y}, ${parentPos.x})`;
+      })
       .style('opacity', 0)
       .remove();
 
@@ -434,10 +525,12 @@ class MindMap {
    * Create a diagonal (curved path) between two nodes
    */
   diagonal(s, d) {
-    return `M ${s.y} ${s.x}
-            C ${(s.y + d.y) / 2} ${s.x},
-              ${(s.y + d.y) / 2} ${d.x},
-              ${d.y} ${d.x}`;
+    const posS = this.getPos(s);
+    const posD = this.getPos(d);
+    return `M ${posS.y} ${posS.x}
+            C ${(posS.y + posD.y) / 2} ${posS.x},
+              ${(posS.y + posD.y) / 2} ${posD.x},
+              ${posD.y} ${posD.x}`;
   }
 
   /**
@@ -452,11 +545,7 @@ class MindMap {
   }
 
   zoomReset() {
-    const rect = this.container.getBoundingClientRect();
-    this.svg.transition().duration(500).call(
-      this.zoom.transform,
-      d3.zoomIdentity.translate(this.margin.left, rect.height / 2)
-    );
+    this.updateCenter(true);
   }
 
   /**
@@ -466,6 +555,7 @@ class MindMap {
     if (!this.svg) return;
     const rect = this.container.getBoundingClientRect();
     this.svg.attr('width', rect.width).attr('height', rect.height);
+    this.updateCenter(false);
   }
 }
 
@@ -497,6 +587,7 @@ class App {
     this.mindMap = null;
     this.searchTerm = '';
     this.selectedCategory = null;
+    this.layoutMode = this.data.settings?.layoutMode || 'left-to-right';
 
     this.initTheme();
     this.initMindMap();
@@ -538,6 +629,7 @@ class App {
   initMindMap() {
     const container = document.getElementById('mindmapContainer');
     this.mindMap = new MindMap(container);
+    this.mindMap.layoutMode = this.layoutMode;
 
     this.mindMap.onNodeClick = (nodeData) => {
       if (nodeData.type === 'repo') {
@@ -554,10 +646,12 @@ class App {
     const hasRepos = this.data.categories.some(c => c.repos.length > 0);
     const emptyState = document.getElementById('emptyState');
     const zoomControls = document.getElementById('zoomControls');
+    const layoutControls = document.getElementById('layoutControls');
 
     if (!hasRepos) {
       if (emptyState) emptyState.style.display = 'flex';
       if (zoomControls) zoomControls.style.display = 'none';
+      if (layoutControls) layoutControls.style.display = 'none';
       // Clear SVG if exists
       const container = document.getElementById('mindmapContainer');
       if (container) {
@@ -570,6 +664,7 @@ class App {
 
     if (emptyState) emptyState.style.display = 'none';
     if (zoomControls) zoomControls.style.display = 'flex';
+    if (layoutControls) layoutControls.style.display = 'flex';
 
     this.mindMap.render(this.data.categories, this.searchTerm);
   }
@@ -1480,6 +1575,55 @@ class App {
     document.getElementById('zoomInBtn')?.addEventListener('click', () => this.mindMap.zoomIn());
     document.getElementById('zoomOutBtn')?.addEventListener('click', () => this.mindMap.zoomOut());
     document.getElementById('zoomResetBtn')?.addEventListener('click', () => this.mindMap.zoomReset());
+
+    // Layout switcher controls
+    const layoutLtrBtn = document.getElementById('layoutLtrBtn');
+    const layoutBiBtn = document.getElementById('layoutBiBtn');
+    const layoutRadialBtn = document.getElementById('layoutRadialBtn');
+
+    const updateActiveLayoutButton = (mode) => {
+      [layoutLtrBtn, layoutBiBtn, layoutRadialBtn].forEach(btn => {
+        if (btn) btn.classList.remove('btn--active');
+      });
+      if (mode === 'left-to-right' && layoutLtrBtn) layoutLtrBtn.classList.add('btn--active');
+      if (mode === 'bi-directional' && layoutBiBtn) layoutBiBtn.classList.add('btn--active');
+      if (mode === 'radial' && layoutRadialBtn) layoutRadialBtn.classList.add('btn--active');
+    };
+
+    updateActiveLayoutButton(this.layoutMode);
+
+    layoutLtrBtn?.addEventListener('click', () => {
+      this.layoutMode = 'left-to-right';
+      this.data.settings.layoutMode = this.layoutMode;
+      this.storage.save(this.data);
+      this.mindMap.layoutMode = this.layoutMode;
+      updateActiveLayoutButton(this.layoutMode);
+      this.mindMap.updateCenter();
+      this.renderMindMap();
+      this.toast.show('Chuyển sang sơ đồ trải ngang phải', 'info');
+    });
+
+    layoutBiBtn?.addEventListener('click', () => {
+      this.layoutMode = 'bi-directional';
+      this.data.settings.layoutMode = this.layoutMode;
+      this.storage.save(this.data);
+      this.mindMap.layoutMode = this.layoutMode;
+      updateActiveLayoutButton(this.layoutMode);
+      this.mindMap.updateCenter();
+      this.renderMindMap();
+      this.toast.show('Chuyển sang sơ đồ trải hai bên', 'info');
+    });
+
+    layoutRadialBtn?.addEventListener('click', () => {
+      this.layoutMode = 'radial';
+      this.data.settings.layoutMode = this.layoutMode;
+      this.storage.save(this.data);
+      this.mindMap.layoutMode = this.layoutMode;
+      updateActiveLayoutButton(this.layoutMode);
+      this.mindMap.updateCenter();
+      this.renderMindMap();
+      this.toast.show('Chuyển sang sơ đồ tỏa tròn', 'info');
+    });
 
     // Export / Import
     document.getElementById('exportBtn').addEventListener('click', () => {
