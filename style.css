@@ -446,6 +446,7 @@ body {
   border-radius: var(--radius-full);
 }
 
+.category-item__edit,
 .category-item__delete {
   opacity: 0;
   background: none;
@@ -458,8 +459,14 @@ body {
   transition: all var(--transition-fast);
 }
 
+.category-item:hover .category-item__edit,
 .category-item:hover .category-item__delete {
   opacity: 1;
+}
+
+.category-item__edit:hover {
+  color: var(--accent-blue);
+  background: var(--bg-hover);
 }
 
 .category-item__delete:hover {

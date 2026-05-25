@@ -576,12 +576,12 @@ class App {
     const quickSelect = document.getElementById('quickCategorySelect');
     const modalSelect = document.getElementById('modalCategorySelect');
 
-    // Category list
     list.innerHTML = this.data.categories.map(cat => `
       <li class="category-item ${this.selectedCategory === cat.id ? 'active' : ''}" data-id="${cat.id}">
         <span class="category-item__icon">${cat.icon || '📁'}</span>
         <span class="category-item__name">${cat.name}</span>
         <span class="category-item__count">${cat.repos.length}</span>
+        <button class="category-item__edit" data-id="${cat.id}" title="Sửa">✏️</button>
         <button class="category-item__delete" data-id="${cat.id}" title="Xóa">🗑</button>
       </li>
     `).join('');
@@ -1361,6 +1361,36 @@ class App {
 
     // Category list clicks
     document.getElementById('categoryList').addEventListener('click', (e) => {
+      // Edit button
+      const editBtn = e.target.closest('.category-item__edit');
+      if (editBtn) {
+        e.stopPropagation();
+        const cat = this.data.categories.find(c => c.id === editBtn.dataset.id);
+        if (cat) {
+          const catTitle = document.getElementById('categoryModalTitle');
+          if (catTitle) catTitle.textContent = 'Sửa Danh mục';
+          const nameInput = document.getElementById('categoryNameInput');
+          if (nameInput) nameInput.value = cat.name;
+          const iconInput = document.getElementById('categoryIconInput');
+          if (iconInput) iconInput.value = cat.icon;
+          const editId = document.getElementById('editCategoryId');
+          if (editId) editId.value = cat.id;
+          const colorInput = document.getElementById('categoryColorInput');
+          if (colorInput) colorInput.value = cat.color;
+          
+          // Select emoji in emoji picker
+          document.querySelectorAll('.emoji-item').forEach(el => {
+            el.classList.toggle('selected', el.dataset.emoji === cat.icon);
+          });
+          // Select color in color picker
+          document.querySelectorAll('.color-swatch').forEach(s => {
+            s.classList.toggle('selected', s.dataset.color === cat.color);
+          });
+          this.openModal('addCategoryModal');
+        }
+        return;
+      }
+
       // Delete button
       const deleteBtn = e.target.closest('.category-item__delete');
       if (deleteBtn) {
