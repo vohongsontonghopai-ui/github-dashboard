@@ -90,37 +90,48 @@
 
 /* --- Dark Theme (Chalkboard) --- */
 [data-theme="dark"] {
-  --bg-primary: #1a2a1a;
-  --bg-secondary: #1f301f;
-  --bg-tertiary: #253525;
-  --bg-hover: #2d402d;
-  --bg-active: #354a35;
-  --bg-sidebar: #1c2c1c;
-  --bg-card: #223222;
-  --bg-modal-overlay: rgba(0, 10, 0, 0.7);
+  --bg-primary: #000000;
+  --bg-secondary: #0d0d0d;
+  --bg-tertiary: #161616;
+  --bg-hover: #222222;
+  --bg-active: #ffffff;
+  --bg-sidebar: #050505;
+  --bg-card: #0c0c0c;
+  --bg-modal-overlay: rgba(0, 0, 0, 0.85);
 
-  --text-primary: #e8e0d0;
-  --text-secondary: #a8b8a0;
-  --text-tertiary: #708068;
-  --text-accent: #70b8e8;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #7c7c7c;
+  --text-accent: #ffffff;
 
-  --border-default: #3a5a3a;
-  --border-light: #304830;
-  --border-focus: #e08060;
+  --border-default: #333333;
+  --border-light: #222222;
+  --border-focus: #ffffff;
+  --border-ruled: #222222; /* Sleek black notebook ruled lines */
 
-  --shadow-sm: 2px 2px 0px rgba(0,0,0,0.2);
-  --shadow-md: 3px 3px 0px rgba(0,0,0,0.25);
-  --shadow-lg: 4px 4px 0px rgba(0,0,0,0.3);
-  --shadow-xl: 6px 6px 0px rgba(0,0,0,0.35);
+  --shadow-sm: 2px 2px 0px rgba(255,255,255,0.08);
+  --shadow-md: 3px 3px 0px rgba(255,255,255,0.12);
+  --shadow-lg: 4px 4px 0px rgba(255,255,255,0.16);
+  --shadow-xl: 6px 6px 0px rgba(255,255,255,0.2);
 
-  --node-cat-bg: #1a3040;
-  --node-cat-border: #70b8e8;
-  --node-repo-bg: #302818;
-  --node-repo-border: #e8923a;
-  --node-detail-bg: #183018;
-  --node-detail-border: #4aaf5a;
-  --link-color: #3a5a3a;
-  --link-hover: #e08060;
+  --node-cat-bg: #0c0c0c;
+  --node-cat-border: #ffffff;
+  --node-repo-bg: #050505;
+  --node-repo-border: #888888;
+  --node-detail-bg: #000000;
+  --node-detail-border: #555555;
+  --link-color: #222222;
+  --link-hover: #ffffff;
+
+  /* Crayon Monochrome Palette for B&W Mode */
+  --accent-red: #ffffff;
+  --accent-orange: #dcdcdc;
+  --accent-yellow: #ffffff;
+  --accent-green: #ffffff;
+  --accent-blue: #ffffff;
+  --accent-purple: #888888;
+  --accent-pink: #dcdcdc;
+  --accent-brown: #555555;
 }
 
 /* --- Global Reset --- */
@@ -1250,7 +1261,7 @@ body {
 }
 
 [data-theme="dark"] .detail-hero__banner {
-  background: linear-gradient(135deg, #529cca30, #6940a530, #d9730d30);
+  background: linear-gradient(135deg, #1c1c1c, #050505) !important;
 }
 
 .detail-hero__content {
@@ -1710,7 +1721,8 @@ body {
 }
 
 [data-theme="dark"] .detail-problem-card__example {
-  background: linear-gradient(135deg, #2a2518, #2d2114);
+  background: linear-gradient(135deg, #0d0d0d, #141414) !important;
+  border-left-color: #ffffff !important;
 }
 
 .detail-problem-card__example-label {
@@ -1753,7 +1765,8 @@ body {
 }
 
 [data-theme="dark"] .detail-install-method--recommended {
-  background: linear-gradient(135deg, var(--bg-secondary), rgba(15, 123, 108, 0.08));
+  background: linear-gradient(135deg, var(--bg-secondary), rgba(255, 255, 255, 0.02)) !important;
+  border-color: #ffffff !important;
 }
 
 .detail-install-method__header {
@@ -1853,8 +1866,8 @@ body {
 }
 
 [data-theme="dark"] .detail-takeaway {
-  background: linear-gradient(135deg, #1a2335, #192030);
-  border-color: rgba(46, 170, 220, 0.15);
+  background: linear-gradient(135deg, #0d0d0d, #141414) !important;
+  border-color: #333333 !important;
 }
 
 .detail-takeaway__content {
@@ -2494,8 +2507,8 @@ body {
 }
 
 [data-theme="dark"] .header {
-  background: linear-gradient(90deg, #2a4028, #304830, #2a4028) !important;
-  border-bottom-color: #4a6a4a !important;
+  background: linear-gradient(90deg, #050505, #121212, #050505) !important;
+  border-bottom-color: #222222 !important;
 }
 
 /* --- Sidebar: Spiral Notebook Edge --- */
@@ -2761,8 +2774,8 @@ body {
 }
 
 [data-theme="dark"] .modal {
-  background: #2a3520 !important;
-  border-color: #4a6a3a !important;
+  background: #0d0d0d !important;
+  border-color: #333333 !important;
 }
 
 /* --- Toast: Paper Note --- */
@@ -2865,8 +2878,8 @@ body {
 }
 
 [data-theme="dark"] .detail-eli5 {
-  background: linear-gradient(135deg, #2a2818, #2d2414) !important;
-  border-color: #8a7830 !important;
+  background: linear-gradient(135deg, #0d0d0d, #141414) !important;
+  border-color: #333333 !important;
 }
 
 /* --- Compare Table: Hand-Drawn --- */
@@ -2994,7 +3007,8 @@ body {
 }
 
 [data-theme="dark"] .detail-quickstart {
-  background: linear-gradient(135deg, #182818, #1a3018) !important;
+  background: linear-gradient(135deg, #0d0d0d, #141414) !important;
+  border-color: #ffffff !important;
 }
 
 /* --- Alt pills: Stamp style --- */
@@ -3014,6 +3028,68 @@ body {
 .sidebar__footer {
   border-top: 3px dashed var(--border-default) !important;
   background: linear-gradient(90deg, transparent, rgba(240,200,100,0.15), transparent);
+}
+
+/* --- Dark Theme B&W Specific Overrides --- */
+[data-theme="dark"] .category-item.active {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+  box-shadow: 3px 3px 0px rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="dark"] .category-item__count {
+  background: #222222 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .category-item.active .category-item__count {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .category-item:hover {
+  background: #111111 !important;
+  border-color: #333333 !important;
+}
+
+[data-theme="dark"] .detail-tag {
+  background: #0d0d0d !important;
+  color: #ffffff !important;
+  border-color: #333333 !important;
+}
+
+[data-theme="dark"] .detail-alt-pill {
+  background: #0d0d0d !important;
+  color: #ffffff !important;
+  border-color: #333333 !important;
+}
+
+[data-theme="dark"] .toast {
+  background: #0d0d0d !important;
+  color: #ffffff !important;
+  border-color: #333333 !important;
+}
+
+[data-theme="dark"] .detail-notes__textarea {
+  background-image: linear-gradient(#222222 1px, transparent 1px) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .cmd-palette {
+  background: #0a0a0a !important;
+  border-color: #333333 !important;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] .cmd-palette__input {
+  background: #121212 !important;
+  border-color: #222222 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .cmd-palette__input:focus {
+  border-color: #ffffff !important;
 }
 
 /* --- Print: remove grid bg --- */
