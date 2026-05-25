@@ -266,7 +266,7 @@ class MindMap {
       .style('stroke', d => {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         if (d.target.data.type === 'category') {
-          return isDark ? '#ffffff' : (d.target.data.data?.color || 'var(--link-color)');
+          return isDark ? '#000000' : (d.target.data.data?.color || 'var(--link-color)');
         }
         return 'var(--link-color)';
       });
@@ -342,7 +342,7 @@ class MindMap {
         const cat = d.data.data;
         const repoCount = cat.repos ? cat.repos.length : 0;
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        card.style('border-left', `4px solid ${isDark ? '#ffffff' : cat.color}`);
+        card.style('border-left', `4px solid ${isDark ? '#000000' : cat.color}`);
         card.html(`
           <div style="display:flex;align-items:center;gap:8px">
             <span style="font-size:18px">${cat.icon || '📁'}</span>

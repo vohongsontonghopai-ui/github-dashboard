@@ -90,48 +90,48 @@
 
 /* --- Dark Theme (Chalkboard) --- */
 [data-theme="dark"] {
-  --bg-primary: #000000;
-  --bg-secondary: #0d0d0d;
-  --bg-tertiary: #161616;
-  --bg-hover: #222222;
-  --bg-active: #ffffff;
-  --bg-sidebar: #050505;
-  --bg-card: #0c0c0c;
-  --bg-modal-overlay: rgba(0, 0, 0, 0.85);
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --bg-tertiary: #f0f0f0;
+  --bg-hover: #eaeaea;
+  --bg-active: #000000;
+  --bg-sidebar: #ffffff;
+  --bg-card: #fafafa;
+  --bg-modal-overlay: rgba(0, 0, 0, 0.4);
 
-  --text-primary: #ffffff;
-  --text-secondary: #b0b0b0;
-  --text-tertiary: #7c7c7c;
-  --text-accent: #ffffff;
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --text-tertiary: #666666;
+  --text-accent: #000000;
 
-  --border-default: #333333;
-  --border-light: #222222;
-  --border-focus: #ffffff;
-  --border-ruled: #222222; /* Sleek black notebook ruled lines */
+  --border-default: #000000;
+  --border-light: #dddddd;
+  --border-focus: #000000;
+  --border-ruled: #eaeaea; /* Light grey notebook ruled lines */
 
-  --shadow-sm: 2px 2px 0px rgba(255,255,255,0.08);
-  --shadow-md: 3px 3px 0px rgba(255,255,255,0.12);
-  --shadow-lg: 4px 4px 0px rgba(255,255,255,0.16);
-  --shadow-xl: 6px 6px 0px rgba(255,255,255,0.2);
+  --shadow-sm: 2px 2px 0px rgba(0,0,0,0.08);
+  --shadow-md: 3px 3px 0px rgba(0,0,0,0.12);
+  --shadow-lg: 4px 4px 0px rgba(0,0,0,0.16);
+  --shadow-xl: 6px 6px 0px rgba(0,0,0,0.2);
 
-  --node-cat-bg: #0c0c0c;
-  --node-cat-border: #ffffff;
-  --node-repo-bg: #050505;
-  --node-repo-border: #888888;
-  --node-detail-bg: #000000;
-  --node-detail-border: #555555;
-  --link-color: #222222;
-  --link-hover: #ffffff;
+  --node-cat-bg: #ffffff;
+  --node-cat-border: #000000;
+  --node-repo-bg: #ffffff;
+  --node-repo-border: #444444;
+  --node-detail-bg: #ffffff;
+  --node-detail-border: #888888;
+  --link-color: #cccccc;
+  --link-hover: #000000;
 
-  /* Crayon Monochrome Palette for B&W Mode */
-  --accent-red: #ffffff;
-  --accent-orange: #dcdcdc;
-  --accent-yellow: #ffffff;
-  --accent-green: #ffffff;
-  --accent-blue: #ffffff;
-  --accent-purple: #888888;
-  --accent-pink: #dcdcdc;
-  --accent-brown: #555555;
+  /* Crayon Monochrome Palette for B&W Mode (Black on White) */
+  --accent-red: #000000;
+  --accent-orange: #333333;
+  --accent-yellow: #000000;
+  --accent-green: #000000;
+  --accent-blue: #000000;
+  --accent-purple: #444444;
+  --accent-pink: #333333;
+  --accent-brown: #666666;
 }
 
 /* --- Global Reset --- */
@@ -2507,8 +2507,8 @@ body {
 }
 
 [data-theme="dark"] .header {
-  background: linear-gradient(90deg, #050505, #121212, #050505) !important;
-  border-bottom-color: #222222 !important;
+  background: #ffffff !important;
+  border-bottom-color: #000000 !important;
 }
 
 /* --- Sidebar: Spiral Notebook Edge --- */
@@ -2774,8 +2774,8 @@ body {
 }
 
 [data-theme="dark"] .modal {
-  background: #0d0d0d !important;
-  border-color: #333333 !important;
+  background: #ffffff !important;
+  border-color: #000000 !important;
 }
 
 /* --- Toast: Paper Note --- */
@@ -2878,8 +2878,8 @@ body {
 }
 
 [data-theme="dark"] .detail-eli5 {
-  background: linear-gradient(135deg, #0d0d0d, #141414) !important;
-  border-color: #333333 !important;
+  background: linear-gradient(135deg, #fafafa, #f5f5f5) !important;
+  border-color: #000000 !important;
 }
 
 /* --- Compare Table: Hand-Drawn --- */
@@ -3007,8 +3007,8 @@ body {
 }
 
 [data-theme="dark"] .detail-quickstart {
-  background: linear-gradient(135deg, #0d0d0d, #141414) !important;
-  border-color: #ffffff !important;
+  background: linear-gradient(135deg, #ffffff, #fafafa) !important;
+  border-color: #000000 !important;
 }
 
 /* --- Alt pills: Stamp style --- */
@@ -3032,64 +3032,64 @@ body {
 
 /* --- Dark Theme B&W Specific Overrides --- */
 [data-theme="dark"] .category-item.active {
-  background: #ffffff !important;
-  color: #000000 !important;
-  border-color: #ffffff !important;
-  box-shadow: 3px 3px 0px rgba(255, 255, 255, 0.2) !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.15) !important;
 }
 
 [data-theme="dark"] .category-item__count {
-  background: #222222 !important;
-  color: #ffffff !important;
+  background: #eeeeee !important;
+  color: #000000 !important;
 }
 
 [data-theme="dark"] .category-item.active .category-item__count {
-  background: #000000 !important;
-  color: #ffffff !important;
+  background: #ffffff !important;
+  color: #000000 !important;
 }
 
 [data-theme="dark"] .category-item:hover {
-  background: #111111 !important;
-  border-color: #333333 !important;
+  background: #f0f0f0 !important;
+  border-color: #dddddd !important;
 }
 
 [data-theme="dark"] .detail-tag {
-  background: #0d0d0d !important;
-  color: #ffffff !important;
-  border-color: #333333 !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
 }
 
 [data-theme="dark"] .detail-alt-pill {
-  background: #0d0d0d !important;
-  color: #ffffff !important;
-  border-color: #333333 !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
 }
 
 [data-theme="dark"] .toast {
-  background: #0d0d0d !important;
-  color: #ffffff !important;
-  border-color: #333333 !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
 }
 
 [data-theme="dark"] .detail-notes__textarea {
-  background-image: linear-gradient(#222222 1px, transparent 1px) !important;
-  color: #ffffff !important;
+  background-image: linear-gradient(#eeeeee 1px, transparent 1px) !important;
+  color: #000000 !important;
 }
 
 [data-theme="dark"] .cmd-palette {
-  background: #0a0a0a !important;
-  border-color: #333333 !important;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05) !important;
+  background: #ffffff !important;
+  border-color: #000000 !important;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1) !important;
 }
 
 [data-theme="dark"] .cmd-palette__input {
-  background: #121212 !important;
-  border-color: #222222 !important;
-  color: #ffffff !important;
+  background: #fafafa !important;
+  border-color: #dddddd !important;
+  color: #000000 !important;
 }
 
 [data-theme="dark"] .cmd-palette__input:focus {
-  border-color: #ffffff !important;
+  border-color: #000000 !important;
 }
 
 /* --- Print: remove grid bg --- */
