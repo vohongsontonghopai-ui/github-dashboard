@@ -80,7 +80,7 @@ GITHUB DASHBOARD/
 
 ## 🔧 Cấu hình kỹ thuật
 
-- **AI Model:** `google/gemini-2.0-flash-001` qua OpenRouter
+- **AI Model:** `anthropic/claude-haiku-4.5` qua OpenRouter
 - **D3.js:** v7 (CDN)
 - **Fonts:** Playwrite VN, Mali, Baloo 2, Quicksand (Google Fonts CDN)
 - **Deploy:** Vercel

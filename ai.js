@@ -90,7 +90,7 @@ class GitHubAPI {
 class AIAnalyzer {
   constructor() {
     this.endpoint = 'https://openrouter.ai/api/v1/chat/completions';
-    this.model = 'google/gemini-2.0-flash-001';
+    this.model = 'anthropic/claude-haiku-4.5';
   }
 
   /**
