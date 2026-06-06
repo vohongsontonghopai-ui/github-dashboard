@@ -21,7 +21,8 @@ class StorageManager {
       ],
       settings: {
         theme: 'dark',
-        openrouterApiKey: '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'
+        openrouterApiKey: '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',
+        apiProvider: 'openrouter'
       }
     };
   }
@@ -33,6 +34,7 @@ class StorageManager {
       const data = JSON.parse(raw);
       // Ensure settings exist
       if (!data.settings) data.settings = this.getDefaultData().settings;
+      if (!data.settings.apiProvider) data.settings.apiProvider = 'openrouter';
       if (!data.categories) data.categories = [];
       return data;
     } catch {
@@ -611,18 +613,53 @@ class App {
     this.save();
   }
 
-  // ---- API Key ----
+  // ---- API Key & Provider ----
   loadApiKey() {
     const input = document.getElementById('apiKeyInput');
     if (this.data.settings?.openrouterApiKey) {
       input.value = this.data.settings.openrouterApiKey;
     }
+
+    const providerSelect = document.getElementById('apiProviderSelect');
+    if (providerSelect && this.data.settings?.apiProvider) {
+      providerSelect.value = this.data.settings.apiProvider;
+    }
+
+    this.toggleApiKeyVisibility();
   }
 
   saveApiKey() {
     const key = document.getElementById('apiKeyInput').value.trim();
     this.data.settings.openrouterApiKey = key;
     this.save();
+  }
+
+  saveApiProvider() {
+    const providerSelect = document.getElementById('apiProviderSelect');
+    if (providerSelect) {
+      const provider = providerSelect.value;
+      if (!this.data.settings) this.data.settings = {};
+      this.data.settings.apiProvider = provider;
+      this.save();
+      this.toggleApiKeyVisibility();
+    }
+  }
+
+  toggleApiKeyVisibility() {
+    const providerSelect = document.getElementById('apiProviderSelect');
+    const apiKeyLabel = document.getElementById('apiKeyLabel');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+
+    if (!providerSelect) return;
+
+    const provider = providerSelect.value;
+    if (provider === 'kiro') {
+      if (apiKeyLabel) apiKeyLabel.textContent = 'API Key (Tùy chọn)';
+      if (apiKeyInput) apiKeyInput.placeholder = 'Nhập API Key nếu Kiro yêu cầu...';
+    } else {
+      if (apiKeyLabel) apiKeyLabel.textContent = 'OpenRouter API Key';
+      if (apiKeyInput) apiKeyInput.placeholder = 'sk-or-v1-...';
+    }
   }
 
   // ---- Mind Map ----
@@ -730,7 +767,7 @@ class App {
       let analysis;
       let aiWarning = '';
       try {
-        analysis = await aiAnalyzer.analyze(repoInfo, this.data.settings?.openrouterApiKey);
+        analysis = await aiAnalyzer.analyze(repoInfo, this.data.settings?.openrouterApiKey, this.data.settings?.apiProvider);
       } catch (aiErr) {
         if (aiErr.message === 'API_KEY_INVALID') {
           aiWarning = '⚠️ API key không hợp lệ hoặc đã hết hạn. Dùng phân tích cơ bản.';
@@ -1570,6 +1607,9 @@ class App {
 
     // API Key save on blur
     document.getElementById('apiKeyInput').addEventListener('blur', () => this.saveApiKey());
+
+    // API Provider select change
+    document.getElementById('apiProviderSelect')?.addEventListener('change', () => this.saveApiProvider());
 
     // Zoom controls
     document.getElementById('zoomInBtn')?.addEventListener('click', () => this.mindMap.zoomIn());

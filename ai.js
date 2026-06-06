@@ -97,10 +97,12 @@ class AIAnalyzer {
    * Analyze a repo using AI — Deep Vietnamese analysis
    * @param {Object} repoInfo - Repository info from GitHub API
    * @param {string} apiKey - OpenRouter API key
+   * @param {string} provider - API Provider (openrouter or kiro)
    * @returns {Object} Comprehensive AI analysis result
    */
-  async analyze(repoInfo, apiKey) {
-    if (!apiKey) {
+  async analyze(repoInfo, apiKey, provider = 'openrouter') {
+    const isKiro = provider === 'kiro';
+    if (!isKiro && !apiKey) {
       console.warn('No OpenRouter API key provided, using fallback analysis');
       return this.fallbackAnalysis(repoInfo);
     }
@@ -206,17 +208,26 @@ QUY TẮC VIẾT — TUÂN THỦ TUYỆT ĐỐI:
 9. Viết thân thiện, giáo dục, dùng emoji hợp lý, như viết blog công nghệ cho người Việt
 10. Mỗi ví dụ phải có TÌNH HUỐNG cụ thể, KHÔNG viết kiểu "ví dụ: sử dụng X để làm Y"`;
 
+    const endpoint = isKiro ? 'http://localhost:20128/dashboard/providers/kiro' : 'https://openrouter.ai/api/v1/chat/completions';
+    const model = isKiro ? 'anthropic/claude-opus-4.8' : 'anthropic/claude-haiku-4.5';
+
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    if (apiKey) {
+      headers['Authorization'] = `Bearer ${apiKey}`;
+    }
+    if (!isKiro) {
+      headers['HTTP-Referer'] = 'https://github-dashboard.local';
+      headers['X-OpenRouter-Title'] = 'GitHub Dashboard';
+    }
+
     try {
-      const resp = await fetch(this.endpoint, {
+      const resp = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://github-dashboard.local',
-          'X-OpenRouter-Title': 'GitHub Dashboard'
-        },
+        headers: headers,
         body: JSON.stringify({
-          model: this.model,
+          model: model,
           messages: [
             {
               role: 'system',

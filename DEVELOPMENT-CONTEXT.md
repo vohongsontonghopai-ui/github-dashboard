@@ -80,7 +80,9 @@ GITHUB DASHBOARD/
 
 ## 🔧 Cấu hình kỹ thuật
 
-- **AI Model:** `anthropic/claude-haiku-4.5` qua OpenRouter
+- **AI Model & Routing:**
+  - **OpenRouter:** Model `anthropic/claude-haiku-4.5` qua OpenRouter endpoint
+  - **Kiro Local:** Model `anthropic/claude-opus-4.8` qua local endpoint `http://localhost:20128/dashboard/providers/kiro`
 - **D3.js:** v7 (CDN)
 - **Fonts:** Playwrite VN, Mali, Baloo 2, Quicksand (Google Fonts CDN)
 - **Deploy:** Vercel
