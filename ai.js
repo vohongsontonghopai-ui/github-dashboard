@@ -102,7 +102,9 @@ class AIAnalyzer {
    */
   async analyze(repoInfo, apiKey, provider = 'openrouter') {
     const isKiro = provider === 'kiro';
-    if (!isKiro && !apiKey) {
+    const isKiroGo = provider === 'kirogo';
+    const isLocal = isKiro || isKiroGo;
+    if (!isLocal && !apiKey) {
       console.warn('No OpenRouter API key provided, using fallback analysis');
       return this.fallbackAnalysis(repoInfo);
     }
@@ -208,8 +210,17 @@ QUY TẮC VIẾT — TUÂN THỦ TUYỆT ĐỐI:
 9. Viết thân thiện, giáo dục, dùng emoji hợp lý, như viết blog công nghệ cho người Việt
 10. Mỗi ví dụ phải có TÌNH HUỐNG cụ thể, KHÔNG viết kiểu "ví dụ: sử dụng X để làm Y"`;
 
-    const endpoint = isKiro ? 'http://localhost:20128/dashboard/providers/kiro' : 'https://openrouter.ai/api/v1/chat/completions';
-    const model = isKiro ? 'anthropic/claude-opus-4.8' : 'anthropic/claude-haiku-4.5';
+    let endpoint, model;
+    if (isKiroGo) {
+      endpoint = 'http://localhost:8080/v1/chat/completions';
+      model = 'claude-sonnet-4.5';
+    } else if (isKiro) {
+      endpoint = 'http://localhost:20128/dashboard/providers/kiro';
+      model = 'anthropic/claude-opus-4.8';
+    } else {
+      endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+      model = 'anthropic/claude-haiku-4.5';
+    }
 
     const headers = {
       'Content-Type': 'application/json'
@@ -217,7 +228,7 @@ QUY TẮC VIẾT — TUÂN THỦ TUYỆT ĐỐI:
     if (apiKey) {
       headers['Authorization'] = `Bearer ${apiKey}`;
     }
-    if (!isKiro) {
+    if (!isLocal) {
       headers['HTTP-Referer'] = 'https://github-dashboard.local';
       headers['X-OpenRouter-Title'] = 'GitHub Dashboard';
     }

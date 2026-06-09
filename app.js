@@ -653,9 +653,9 @@ class App {
     if (!providerSelect) return;
 
     const provider = providerSelect.value;
-    if (provider === 'kiro') {
+    if (provider === 'kiro' || provider === 'kirogo') {
       if (apiKeyLabel) apiKeyLabel.textContent = 'API Key (Tùy chọn)';
-      if (apiKeyInput) apiKeyInput.placeholder = 'Nhập API Key nếu Kiro yêu cầu...';
+      if (apiKeyInput) apiKeyInput.placeholder = 'Nhập API Key nếu server yêu cầu...';
     } else {
       if (apiKeyLabel) apiKeyLabel.textContent = 'OpenRouter API Key';
       if (apiKeyInput) apiKeyInput.placeholder = 'sk-or-v1-...';
